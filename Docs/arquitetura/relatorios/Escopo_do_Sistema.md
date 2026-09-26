@@ -25,7 +25,7 @@ A funcionalidade central do **ReCircula** é atuar como um **Marketplace Colabor
 1. **Vitrine Pública de Anúncios:** Catálogo interativo aberto para consulta com busca textual instantânea (_debounce_), filtros por categorias acadêmicas (Livros, Engenharia, Computação, Jalecos, Eletrônicos, etc.) e seleção exclusiva para itens de **Doação** ou venda com preços justos.
 2. **Ciclo Completo de Anúncios (CRUD):** Estudantes autenticados podem cadastrar anúncios com upload de imagens reais, descrição, preço ou flag explícita de gratuidade/doação, além de gerenciar ou excluir suas próprias publicações em um painel (_dashboard_).
 3. **Ponte de Conexão Direta (Comprador-Vendedor):** Em vez de reter pagamentos ou intermediar transações financeiras complexas, o sistema foca no modelo _peer-to-peer_ (P2P) local: conecta os estudantes diretamente via link seguro para WhatsApp com mensagem contextualizada, permitindo que a entrega ocorra presencialmente nos blocos ou pontos de encontro do próprio campus.
-4. **Perfis Acadêmicos Públicos:** Identificação dos anunciantes com biografia, foto de perfil, telefone de contato e histórico de desapegos ativos, transmitindo credibilidade e senso de comunidade.
+4. **Perfis de Anunciantes:** Usuários autenticados podem consultar nome, biografia, foto e anúncios de outros anunciantes. Telefone e e-mail não são exibidos; quando houver telefone cadastrado, um botão inicia uma nova conversa no WhatsApp.
 
 ---
 
@@ -36,6 +36,8 @@ O sistema é projetado sob medida para o público do ambiente universitário, se
 - **Estudantes Ingressantes (Calouros):** Alunos que buscam economizar na aquisição de itens obrigatórios para o início do curso (livros-texto, ferramentas de laboratório, calculadoras e jalecos).
 - **Estudantes Veteranos e Concluintes:** Alunos em semestres avançados que não utilizam mais materiais das fases iniciais e desejam recuperar parte do investimento ou praticar o desapego solidário.
 - **Comunidade Acadêmica Ampla:** Monitores, professores e pesquisadores interessados no reaproveitamento e doação de componentes de hardware, materiais de desenho técnico, livros e mobiliário universitário.
+
+O foco do marketplace é a comunidade acadêmica, mas o cadastro não exige e-mail universitário; qualquer endereço de e-mail válido pode ser utilizado.
 
 ---
 
@@ -50,6 +52,6 @@ A arquitetura do projeto foi planejada adotando o padrão **Full-Stack desacopla
 | **Back-end (API)**         | **Node.js & Express (JavaScript)** | Construção de uma API RESTful escalável, de alta performance assíncrona, estruturada no padrão de arquitetura em camadas (_Routes_, _Controllers_, _Services_, _Repositories_).          |
 | **Validação de Dados**     | **Zod**                            | Validação estrita de esquemas e sanitização de payloads de entrada no back-end, garantindo integridade e prevenindo dados inconsistentes.                                                |
 | **Banco de Dados**         | **PostgreSQL (Supabase)**          | Banco relacional robusto para garantir consistência relacional (tabelas `profiles` e `announces`), integridade referencial com chave estrangeira e suporte a _Row Level Security_ (RLS). |
-| **Autenticação**           | **JWT**                            | Gerenciamento de identidade, emissão e validação de tokens JWT (JSON Web Tokens), persistência segura de sessão e controle de acesso a rotas privadas.                                   |
+| **Autenticação**           | **JWT & bcrypt**                   | O backend gera e valida tokens JWT (JSON Web Tokens) e armazena senhas criptografadas com bcrypt; o Supabase é utilizado como banco, não como provedor de autenticação.                  |
 | **Armazenamento de Mídia** | **Multer & Cloudinary**            | Processamento de uploads `multipart/form-data` no back-end e armazenamento em nuvem com geração de URLs seguras (`https`) e otimização automática de imagens.                            |
 | **Hospedagem / DevOps**    | **Vercel & Render**                | Deploy contínuo e integrado: Front-end hospedado na Vercel e API REST hospedada no Render, com integração a banco de dados em nuvem.                                                     |

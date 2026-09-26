@@ -1,6 +1,6 @@
-# Diagramas de Caso de Uso - CampusLoop
+# Diagramas de Caso de Uso - ReCircula
 
-Abaixo estão os diagramas de caso de uso do sistema **CampusLoop**, modelados com base nos requisitos funcionais e atores definidos. A notação utilizada foi o formato de fluxograma (_flowchart_) do Mermaid.js, amplamente suportado nativamente pelo GitHub e outras ferramentas de Markdown.
+Abaixo estão os diagramas de caso de uso do sistema **ReCircula**, modelados com base nos requisitos funcionais e atores definidos. A notação utilizada foi o formato de fluxograma (_flowchart_) do Mermaid.js, amplamente suportado nativamente pelo GitHub e outras ferramentas de Markdown.
 
 ## 1. Visão Geral (Atores Principais)
 
@@ -14,7 +14,7 @@ flowchart LR
     Cloudinary(["☁️ Cloudinary (Serviço Externo)"])
 
     %% Sistema
-    subgraph CampusLoop [Sistema CampusLoop]
+    subgraph ReCircula [Sistema ReCircula]
         direction TB
 
         %% Subsistema de Autenticação
@@ -30,7 +30,7 @@ flowchart LR
         UC6(Publicar Anúncio)
         UC7(Gerenciar Meus Anúncios)
         UC8(Visualizar/Editar Meu Perfil)
-        UC9(Ver Perfil de Outro Usuário)
+        UC9(Ver Perfil de Outro Usuário - Requer Login)
         UC10(Contatar via WhatsApp)
 
         %% Funcionalidades Internas
@@ -52,6 +52,8 @@ flowchart LR
     Estudante --> UC9
     Estudante --> UC10
 
+    %% Somente usuarios autenticados consultam perfis de outros anunciantes
+
     %% Includes / Relações Internas
     UC6 -. "<<include>>" .-> UC11
     UC8 -. "<<include>>" .-> UC11
@@ -64,7 +66,7 @@ flowchart LR
 
 ## 2. Subsistema de Autenticação e Perfil
 
-Focado exclusivamente nas operações de gestão de acesso à plataforma e edição das informações públicas do estudante.
+Focado nas operações de gestão de acesso, edição do próprio perfil e consulta autenticada do perfil de outro usuário.
 
 ```mermaid
 flowchart LR
@@ -82,6 +84,8 @@ flowchart LR
         UC6(Visualizar Meu Perfil)
         UC7(Editar Meu Perfil)
         UC8(Fazer Upload de Foto)
+        UC9(Visualizar Perfil de Outro Usuario)
+        UC10(Iniciar Conversa no WhatsApp)
     end
 
     Visitante --> UC1
@@ -92,6 +96,8 @@ flowchart LR
     Estudante --> UC5
     Estudante --> UC6
     Estudante --> UC7
+    Estudante --> UC9
+    Estudante --> UC10
 
     UC7 -. "<<include>>" .-> UC8
     UC8 --> Cloudinary
@@ -116,9 +122,9 @@ flowchart LR
         UC3(Buscar Anúncios por Texto)
         UC4(Publicar Novo Anúncio)
         UC5(Upload de Imagem do Anúncio)
-        UC6(Excluir Próprio Anúncio)
+        UC6(Gerenciar Próprios Anúncios - Criar, Editar e Excluir)
         UC7(Acessar Dashboard de Anúncios)
-        UC8(Visualizar Perfil do Anunciante)
+        UC8(Visualizar Perfil do Anunciante - Requer Login)
         UC9(Acionar Contato no WhatsApp)
     end
 
@@ -134,6 +140,8 @@ flowchart LR
     Estudante --> UC7
     Estudante --> UC8
     Estudante --> UC9
+
+    %% Visitantes consultam anuncios, mas nao perfis ou contatos
 
     UC4 -. "<<include>>" .-> UC5
     UC5 --> Cloudinary
