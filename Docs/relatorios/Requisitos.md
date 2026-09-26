@@ -160,7 +160,6 @@
 ### RNF07 — Responsividade
 
 - A interface deve ser **totalmente responsiva**, adaptando-se a dispositivos móveis e desktops.
-- Elementos de navegação (NavBar desktop, BottomNavigation mobile) devem ser distintos por breakpoint.
 - Layouts e espaçamentos devem se ajustar automaticamente via **TailwindCSS**.
 
 ### RNF09 — Usabilidade — Feedback visual

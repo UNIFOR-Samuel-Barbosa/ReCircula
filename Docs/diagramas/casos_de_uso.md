@@ -1,6 +1,6 @@
-# Diagramas de Caso de Uso - CampusLoop
+# Diagramas de Caso de Uso - ReCircula
 
-Abaixo estão os diagramas de caso de uso do sistema **CampusLoop**, modelados com base nos requisitos funcionais e atores definidos. A notação utilizada foi o formato de fluxograma (_flowchart_) do Mermaid.js, amplamente suportado nativamente pelo GitHub e outras ferramentas de Markdown.
+Abaixo estão os diagramas de caso de uso do sistema **ReCircula**, modelados com base nos requisitos funcionais e atores definidos. A notação utilizada foi o formato de fluxograma (_flowchart_) do Mermaid.js, amplamente suportado nativamente pelo GitHub e outras ferramentas de Markdown.
 
 ## 1. Visão Geral (Atores Principais)
 
@@ -14,7 +14,7 @@ flowchart LR
     Cloudinary(["☁️ Cloudinary (Serviço Externo)"])
 
     %% Sistema
-    subgraph CampusLoop [Sistema CampusLoop]
+    subgraph ReCircula [Sistema ReCircula]
         direction TB
 
         %% Subsistema de Autenticação
