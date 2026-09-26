@@ -387,7 +387,7 @@ flowchart LR
 - [Dashboard](#dashboard)
 - [Profile](#profile)
 
-O conjunto contém oito telas de referência para a navegação, autenticação, consulta e gestão de anúncios e perfil.
+O conjunto contém sete telas de referência para a navegação, autenticação, consulta e gestão de anúncios e perfil.
 
 ### Home
 
