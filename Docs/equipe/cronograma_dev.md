@@ -14,7 +14,7 @@
 
 ## Telas e fluxos considerados
 
-Há **8 imagens de protótipo** disponíveis em `Docs/prototype/screenshots`: Home Landing Page, Home Announces, Sing In, Sing Up, Recovery, To Announce, Dashboard e Profile. Para atender aos requisitos, o desenvolvimento considera **10 fluxos/estados de tela**: essas 8 telas, mais redefinição de senha e perfil público de outro usuário. Profile contempla os estados de perfil próprio e público; não são necessários protótipos adicionais para implementá-los.
+Há **7 imagens de protótipo** disponíveis em `docs/prototype/screenshots`: Home, Sing In, Sing Up, Recovery, To Announce, Dashboard e Profile. Para atender aos requisitos, o desenvolvimento considera **8 fluxos/estados de tela**: essas 7 telas + mais redefinição de senha. Profile contempla os estados de perfil próprio e de outro usuário; não são necessários protótipos adicionais para implementá-los.
 
 ## Semana 1 — Fundação e contratos
 
@@ -25,7 +25,7 @@ Há **8 imagens de protótipo** disponíveis em `Docs/prototype/screenshots`: Ho
 | Miguel     | Backend / banco        | Criar scripts versionados de schema e seed no Supabase para `profiles` e `announces`, com chaves, restrições de preço/doação e cascata. Preparar repositórios e acesso ao banco sem expor credenciais.                   |
 | Lorhan     | Frontend               | Implementar as telas de login e cadastro com responsividade, validação de campos e estados de carregamento/erro, seguindo os protótipos.                                                                                 |
 
-**Marco da semana:** aplicação e API inicializadas, banco reproduzível por scripts e contrato inicial dos endpoints acordado. Definir também as rotas necessárias para recuperação/redefinição de senha, renovação do token e consulta de perfil público, ausentes ou incompletas na tabela atual de endpoints.
+**Marco da semana:** aplicação e API inicializadas, banco reproduzível por scripts e contrato inicial dos endpoints acordado, incluindo recuperação/redefinição de senha, renovação do token e consulta autenticada do perfil de outro usuário.
 
 ## Semana 2 — Autenticação e vitrine pública
 
@@ -43,7 +43,7 @@ Há **8 imagens de protótipo** disponíveis em `Docs/prototype/screenshots`: Ho
 | Integrante | Área          | Tarefa e objetivo                                                                                                                                                                                                                                              |
 | ---------- | ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Samuel     | Frontend      | Implementar os formulários de anúncio, Dashboard e Profile; conectar criação/edição/exclusão ao backend, exibir confirmação antes de excluir e separar os estados de perfil próprio e público. Incluir botão contextual de WhatsApp no perfil de outra pessoa. |
-| Henrique   | Backend       | Implementar consulta e edição do perfil próprio e consulta pública de perfil por ID; validar nome, biografia e telefone, proteger alterações pelo dono e integrar foto de perfil ao fluxo de upload.                                                           |
+| Henrique   | Backend       | Implementar consulta e edição do perfil próprio e consulta autenticada de perfil por ID; validar nome, biografia e telefone, proteger alterações pelo dono, ocultar telefone/email nas respostas de perfil alheio e integrar foto ao upload.                   |
 | Miguel     | Backend       | Completar criação, edição e exclusão de anúncios com autorização por proprietário; implementar upload `multipart/form-data` com Multer e armazenamento Cloudinary para anúncio e foto de perfil. Validar preço, doação e imagem obrigatória.                   |
 | Lorhan     | Frontend / QA | Revisar responsividade e validações das telas de autenticação em celular e desktop; corrigir problemas encontrados e verificar os fluxos de login, cadastro e recuperação conectados.                                                                          |
 
@@ -65,7 +65,7 @@ Há **8 imagens de protótipo** disponíveis em `Docs/prototype/screenshots`: Ho
 - Cadastro, login, logout, sessão persistente e recuperação/redefinição de senha funcionam.
 - Vitrine pública permite busca, filtros combinados e ordenação; Dashboard lista apenas anúncios do usuário.
 - Publicação, edição e exclusão respeitam validações e autorização do proprietário.
-- Perfis próprio e público, contato via WhatsApp e upload de imagens estão funcionais.
+- Perfil próprio e consulta autenticada de perfis alheios, contato via WhatsApp sem exibição do número e upload de imagens estão funcionais.
 - Interface responsiva, feedback de carregamento/erro/sucesso e scripts SQL versionados.
 - Frontend e backend publicados, com segredos fora do repositório.
 

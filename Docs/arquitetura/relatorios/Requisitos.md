@@ -18,6 +18,7 @@
 ### RF01 — Cadastro de usuário
 
 - O sistema deve permitir que um novo usuário crie uma conta fornecendo **e-mail** e **senha**.
+- Pode ser utilizado qualquer endereço de e-mail válido; não é exigido e-mail universitário.
 - Ao criar a conta, um **perfil** é automaticamente vinculado ao usuário com nome, biografia, telefone e foto opcionais.
 
 ### RF02 — Login de usuário
@@ -63,7 +64,8 @@
 ### RF09 — Listagem pública de anúncios
 
 - O sistema deve exibir todos os anúncios publicados para **qualquer visitante** (autenticado ou não).
-- Os anúncios devem exibir: imagem, título, categoria, preço (ou indicativo de doação) e dados do anunciante.
+- Os anúncios devem exibir: imagem, título, categoria, preço (ou indicativo de doação), nome e foto do anunciante quando disponíveis.
+- E-mail e telefone do anunciante não devem ser exibidos na interface.
 
 ### RF10 — Busca de anúncios por texto
 
@@ -94,23 +96,26 @@
 
 ### RF15 — Visualização do perfil próprio
 
-- O usuário autenticado deve poder visualizar seu próprio perfil com: foto, nome, biografia, telefone e lista de anúncios publicados.
+- O usuário autenticado deve poder visualizar seu próprio perfil com: foto, nome, biografia e lista de anúncios publicados.
+- O telefone é um dado privado, não deve ser apresentado como texto na interface e pode ser mantido para gerar o link de contato via WhatsApp.
 
-### RF16 — Visualização de perfil público
+### RF16 — Visualização de perfil de outro usuário
 
-- Qualquer usuário autenticado deve poder visualizar o perfil de **outro usuário** pelo seu ID, com foto, nome, biografia, telefone e galeria de anúncios.
+- Somente um usuário autenticado pode visualizar o perfil de **outro usuário** pelo seu ID, com foto, nome, biografia e galeria de anúncios.
+- E-mail e telefone não devem ser exibidos como texto na interface.
 
 ### RF17 — Edição de perfil
 
 - O usuário autenticado deve poder editar as seguintes informações do próprio perfil:
   - **Nome** (mínimo 2 caracteres)
-  - **Biografia** (máximo 500 caracteres)
+  - **Biografia** (máximo 150 caracteres)
   - **Telefone** (máximo 20 caracteres, com formatação automática)
   - **Foto de perfil** (upload de imagem via Cloudinary)
 
 ### RF18 — Contato via WhatsApp
 
-- Ao visualizar o perfil de outro usuário, deve existir um botão que **abra uma conversa no WhatsApp** com mensagem pré-preenchida, caso o anunciante tenha informado seu telefone.
+- Ao visualizar o perfil de outro usuário, deve existir um botão que **abra uma nova conversa no WhatsApp** com mensagem pré-preenchida, caso o anunciante tenha informado seu telefone.
+- O número de telefone não deve ser exibido visualmente; o contato ocorre pelo botão.
 
 ### RF19 — Dashboard de anúncios do usuário
 
@@ -130,7 +135,9 @@
 
 - O backend deve implementar middlewares de controle de acesso e autorização baseados no identificador do usuário validado no token JWT.
 - Usuários só podem **atualizar e excluir** seus próprios anúncios e perfil.
-- Anúncios e perfis são **publicamente legíveis** por qualquer visitante (sem exigência de login para consulta).
+- Anúncios são legíveis por qualquer visitante, sem exigência de login.
+- A consulta de perfis exige autenticação; visitantes não autenticados não podem consultar perfis próprios ou de outros usuários.
+- E-mail e telefone não devem ser apresentados na interface como dados públicos do perfil.
 - O backend deve validar a propriedade do recurso antes de permitir operações de escrita ou exclusão.
 
 ### RNF03 — Validação de dados
@@ -206,61 +213,13 @@
 
 ## 📐 Regras de Negócio
 
-| ID   | Regra                                                                                                                    |
-| ---- | ------------------------------------------------------------------------------------------------------------------------ |
-| RN01 | Um anúncio marcado como **doação** não pode ter preço preenchido.                                                        |
-| RN02 | O preço de um anúncio, quando informado, deve ser **maior ou igual a zero**.                                             |
-| RN03 | Somente o **dono do anúncio** pode editá-lo ou excluí-lo.                                                                |
-| RN04 | Somente o **dono do perfil** pode editá-lo.                                                                              |
-| RN05 | O botão de contato via WhatsApp só é exibido ao visualizar o **perfil de outro usuário** (não o próprio).                |
-| RN06 | Operações de escrita (criar, editar, excluir) **requerem conexão com a internet**.                                       |
-| RN07 | O campo telefone é formatado automaticamente conforme o usuário digita.                                                  |
-| RN08 | A biografia do perfil está limitada a **500 caracteres** no backend e **150 caracteres** no campo de edição do frontend. |
-
----
-
-## 🗄️ Modelo de Dados (Resumo)
-
-### Tabela `profiles`
-
-| Campo           | Tipo        | Restrição                    |
-| --------------- | ----------- | ---------------------------- |
-| `id`            | UUID        | Chave primária               |
-| `email`         | TEXT        | NOT NULL, UNIQUE             |
-| `password_hash` | TEXT        | NOT NULL                     |
-| `name`          | TEXT        | NOT NULL                     |
-| `photo_url`     | TEXT        | Nullable                     |
-| `biography`     | TEXT        | Nullable                     |
-| `telephone`     | TEXT        | Nullable, máx. 20 caracteres |
-| `created_at`    | TIMESTAMPTZ | Default: now()               |
-
-### Tabela `announces`
-
-| Campo         | Tipo        | Restrição                                     |
-| ------------- | ----------- | --------------------------------------------- |
-| `id`          | UUID        | Chave primária                                |
-| `user_id`     | UUID        | NOT NULL, FK → profiles(id) ON DELETE CASCADE |
-| `image_url`   | TEXT        | NOT NULL                                      |
-| `title`       | TEXT        | NOT NULL                                      |
-| `description` | TEXT        | Nullable                                      |
-| `category`    | TEXT        | NOT NULL                                      |
-| `price`       | NUMERIC     | Nullable, check ≥ 0                           |
-| `donation`    | BOOLEAN     | NOT NULL                                      |
-| `created_at`  | TIMESTAMPTZ | Default: now()                                |
-
----
-
-## 🔗 Endpoints da API REST
-
-| Método   | Rota             | Autenticação | Descrição                                |
-| -------- | ---------------- | :----------: | ---------------------------------------- |
-| `POST`   | `/auth/register` |      ❌      | Cadastro de usuário com e-mail e senha   |
-| `POST`   | `/auth/login`    |      ❌      | Autenticação de usuário e emissão de JWT |
-| `GET`    | `/announces`     |      ❌      | Listar anúncios (com filtros opcionais)  |
-| `GET`    | `/announces/:id` |      ❌      | Buscar anúncio por ID                    |
-| `POST`   | `/announces`     |      ✅      | Criar novo anúncio                       |
-| `PATCH`  | `/announces/:id` |      ✅      | Atualizar anúncio                        |
-| `DELETE` | `/announces/:id` |      ✅      | Excluir anúncio                          |
-| `GET`    | `/profiles`      |      ✅      | Visualizar perfil do usuário autenticado |
-| `PATCH`  | `/profiles`      |      ✅      | Atualizar perfil do usuário autenticado  |
-| `POST`   | `/upload`        |      ✅      | Upload de imagem (multipart/form-data)   |
+| ID   | Regra                                                                                                            |
+| ---- | ---------------------------------------------------------------------------------------------------------------- |
+| RN01 | Um anúncio marcado como **doação** não pode ter preço preenchido.                                                |
+| RN02 | O preço de um anúncio, quando informado, deve ser **maior ou igual a zero**.                                     |
+| RN03 | Somente o **dono do anúncio** pode editá-lo ou excluí-lo.                                                        |
+| RN04 | Somente o **dono do perfil** pode editá-lo.                                                                      |
+| RN05 | O botão de contato via WhatsApp só é exibido ao visualizar o **perfil de outro usuário** (não o próprio).        |
+| RN06 | Operações de escrita (criar, editar, excluir) **requerem conexão com a internet**.                               |
+| RN07 | O campo telefone é formatado automaticamente conforme o usuário digita.                                          |
+| RN08 | A biografia do perfil está limitada a **150 caracteres** tanto no backend quanto no campo de edição do frontend. |
