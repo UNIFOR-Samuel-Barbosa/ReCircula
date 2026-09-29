@@ -375,8 +375,8 @@ flowchart LR
 ## 5. Protótipos de Interface
 
 - [Home](#home)
-- [Sing In](#sing-in)
-- [Sing Up](#sing-up)
+- [Sign In](#sign-in)
+- [Sign Up](#sign-up)
 - [Recovery](#recovery)
 - [To Announce](#to-announce)
 - [Dashboard](#dashboard)
@@ -390,17 +390,17 @@ Tela inicial de apresentação do ReCircula, que introduz o marketplace e direci
 
 ![Protótipo da página inicial do ReCircula](../../prototype/screenshots/Home.png)
 
-### Sing In
+### Sign In
 
 Tela para autenticação de uma conta existente por e-mail e senha.
 
-![Protótipo de login](../../prototype/screenshots/auth/Sing%20In.png)
+![Protótipo de login](../../prototype/screenshots/auth/Sign%20In.png)
 
-### Sing Up
+### Sign Up
 
 Tela de cadastro de uma nova conta. A menção visual a e-mail universitário é apenas sugestiva: qualquer e-mail válido pode ser utilizado.
 
-![Protótipo de cadastro](../../prototype/screenshots/auth/Sing%20Up.png)
+![Protótipo de cadastro](../../prototype/screenshots/auth/Sign%20Up.png)
 
 ### Recovery
 
