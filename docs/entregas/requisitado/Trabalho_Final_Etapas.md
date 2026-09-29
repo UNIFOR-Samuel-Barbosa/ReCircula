@@ -65,11 +65,11 @@ Divisão de Funções na Equipe (Sugerida):
 - Integrar o banco de dados e permitir interações básicas com ele
   (exemplo: cadastrar usuários, criar registros, etc.).
 
-- Relatório do Sistema:
-  - Descrição das funcionalidades do sistemas desenvolvidas até o
-    momento.
-  - Tecnologias utilizadas.
-  - Apresentação de diagramas e decisões técnicas adotadas.
+## 3. Relatório do Sistema:
+- Descrição das funcionalidades do sistemas desenvolvidas até o
+  momento.
+- Tecnologias utilizadas.
+- Apresentação de diagramas e decisões técnicas adotadas.
 
 ## 4. Apresentação:
 

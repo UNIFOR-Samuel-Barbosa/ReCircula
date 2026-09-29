@@ -202,45 +202,40 @@ O ReCircula facilita a descoberta de itens e o contato entre os usuários. Pagam
 - A interface deve ser **totalmente responsiva**, adaptando-se a dispositivos móveis e desktops.
 - Layouts e espaçamentos devem se ajustar automaticamente via **TailwindCSS**.
 
-#### RNF09 — Usabilidade — Feedback visual
+#### RNF08 — Usabilidade — Feedback visual
 
 - O sistema deve exibir **indicadores de carregamento** (Spinner) durante operações assíncronas.
 - O sistema deve emitir **Toasts independentes** para sucesso, erro e progresso, sem que o fechamento de um interfira nos demais.
 - Cada Toast deve possuir um **ID único** e **timer independente**.
 
-#### RNF10 — Arquitetura em camadas (Backend)
+#### RNF09 — Arquitetura em camadas (Backend)
 
 - O backend deve seguir a arquitetura: **Routes → Middlewares → Controllers → Services → Repository → Supabase**.
 - Cada camada deve ter responsabilidade única e bem definida.
 - A separação deve facilitar testes unitários, manutenção e evolução independente de cada camada.
 
-#### RNF11 — Padronização em JavaScript (ES6+)
+#### RNF10 — Padronização em JavaScript (ES6+)
 
 - Todo o código (frontend e backend) deve ser escrito em **JavaScript moderno (ES6+)**, utilizando módulos ES (`import`/`export`), funções assíncronas (`async`/`await`) e padrões consistentes de codificação.
 - Constantes, modelos de dados e utilitários devem ser organizados em módulos dedicados para facilitar a manutenção.
 
-#### RNF12 — Escalabilidade da API
+#### RNF11 — Escalabilidade da API
 
 - A API REST deve suportar **múltiplos filtros combinados** em uma única requisição (categoria + busca + doação + ordenação + user_id).
 - A lógica de filtragem deve ser reutilizada entre a listagem pública e o dashboard do usuário.
 
-#### RNF13 — Upload de imagens
+#### RNF12 — Upload de imagens
 
 - O upload de imagens deve ser processado via **Multer** no backend (parse de `multipart/form-data`).
 - As imagens devem ser armazenadas no **Cloudinary** e referenciadas apenas pela URL pública gerada.
 - O sistema requer conexão ativa com a internet para upload e persistência de imagens.
 
-#### RNF14 — Implantação e infraestrutura
+#### RNF13 — Implantação e infraestrutura
 
 - O **frontend** deve ser implantado no **Vercel** com domínio público acessível.
 - O **backend** deve ser implantado no **Render** e consumido exclusivamente pelo frontend.
 - O banco de dados deve ser hospedado no **Supabase** (PostgreSQL gerenciado).
 - As variáveis de ambiente sensíveis não devem ser versionadas no repositório.
-
-#### RNF16 — Manutenção do banco de dados
-
-- Os scripts SQL do banco de dados (schema, políticas e seeds) devem ser **versionados** no repositório.
-- A estrutura do banco deve ser reproduzível em qualquer ambiente Supabase a partir dos scripts SQL disponibilizados.
 
 ### 3.4 Regras de Negócio
 

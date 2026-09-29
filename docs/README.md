@@ -24,8 +24,8 @@
 ## Protótipos
 
 - [Home — página inicial e vitrine](prototype/screenshots/Home.png)
-- [Sing In](prototype/screenshots/auth/Sing%20In.png)
-- [Sing Up](prototype/screenshots/auth/Sing%20Up.png)
+- [Sign In](prototype/screenshots/auth/Sing%20In.png)
+- [Sign Up](prototype/screenshots/auth/Sing%20Up.png)
 - [Recovery](prototype/screenshots/auth/Recovery.png)
 - [To Announce](prototype/screenshots/To%20Announce.png)
 - [Dashboard](prototype/screenshots/Dashboard.png)
