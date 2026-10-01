@@ -1,0 +1,7 @@
+body {
+	background-image: radial-gradient(
+		circle at 50% 0%,
+		color-mix(in oklab, var(--primary) 8%, transparent),
+		transparent 28rem
+	);
+}

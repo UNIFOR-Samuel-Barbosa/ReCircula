@@ -1,0 +1,21 @@
+@layer base {
+	* {
+		border-color: var(--color-border);
+	}
+
+	body {
+		min-width: 320px;
+		background-color: var(--background);
+		color: var(--foreground);
+		font-family: var(--font-sans);
+		letter-spacing: 0;
+	}
+
+	button,
+	a,
+	input,
+	select,
+	textarea {
+		letter-spacing: 0;
+	}
+}
