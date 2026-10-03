@@ -4,7 +4,6 @@ Este arquivo organiza a divisão de responsabilidades entre os integrantes do pr
 
 | Nome do integrante    | Matrícula | Área de atuação                            |
 | --------------------- | --------- | ------------------------------------------ |
-| Samuel Miguel Barbosa | 2517428   | Frontend, Design UX/UI, Gerente de Projeto |
+| Samuel Miguel Barbosa | 2517428   | Frontend, Design UX/UI, Gerente de Projeto, autenticação e QA de frontend |
 | Henrique Lima         | 2520384   | Backend                                    |
 | Miguel Cavalcante     | 2517384   | Backend                                    |
-| Lorhan Dejan          | 2612688   | Frontend                                   |

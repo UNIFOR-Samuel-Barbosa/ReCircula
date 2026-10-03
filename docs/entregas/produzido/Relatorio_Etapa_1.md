@@ -3,7 +3,7 @@
 **Disciplina:** Desenvolvimento Web  
 **Instituição:** Universidade de Fortaleza (UNIFOR)  
 **Entrega:** Etapa 1 — Plano de Trabalho  
-**Equipe:** Samuel Miguel Barbosa, Henrique Lima, Miguel Cavalcante e Lorhan Dejan
+**Equipe:** Samuel Miguel Barbosa, Henrique Lima e Miguel Cavalcante
 
 > Este documento consolida o planejamento do projeto a partir do escopo, requisitos, diagramas, protótipos e arquivos da equipe. As tecnologias, funcionalidades e publicações descritas são planejadas; não representam, por si só, funcionalidades já implementadas.
 
@@ -543,10 +543,9 @@ As entradas são validadas no backend com Zod. Erros previstos usam códigos HTT
 
 | Integrante            | Matrícula | Responsabilidade principal                                                                  |
 | --------------------- | --------- | ------------------------------------------------------------------------------------------- |
-| Samuel Miguel Barbosa | 2517428   | Frontend, UX/UI e gerência do projeto; coordenação da integração e dos critérios de aceite. |
+| Samuel Miguel Barbosa | 2517428   | Frontend, UX/UI, gerência do projeto, autenticação e QA de frontend; coordenação da integração e dos critérios de aceite. |
 | Henrique Lima         | 2520384   | Backend, autenticação, autorização e perfis.                                                |
 | Miguel Cavalcante     | 2517384   | Backend, banco de dados, anúncios e uploads.                                                |
-| Lorhan Dejan          | 2612688   | Frontend e apoio de QA, especialmente nos fluxos de autenticação e responsividade.          |
 
 A divisão detalhada por semana está registrada em [responsabilidades.md](../../equipe/responsabilidades.md) e [cronograma_dev.md](../../equipe/cronograma_dev.md).
 
