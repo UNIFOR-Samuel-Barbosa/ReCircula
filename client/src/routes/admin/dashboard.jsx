@@ -1,4 +1,4 @@
-import { Link } from "../../lib/navigation";
+import { Link } from "../../components/link";
 import { useState } from "react";
 import { ShieldAlert, Trash2 } from "lucide-react";
 import { listings as initialListings, formatPrice } from "../../lib/demo-data";

@@ -1,4 +1,5 @@
-import { Link, useNavigate } from "../lib/navigation";
+import { Link } from "./link";
+import { useNavigate } from "../hooks/useNavigation";
 import { useEffect, useRef, useState } from "react";
 import { LayoutDashboard, LogOut, UserRound } from "lucide-react";
 import { useDemoSession } from "../lib/demo-session";

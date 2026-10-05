@@ -1,4 +1,5 @@
-import { Link, useParams } from "../../lib/navigation";
+import { Link } from "../../components/link";
+import { useParams } from "../../hooks/useNavigation";
 import { ArrowLeft, MessageCircle, MapPin, ShieldCheck } from "lucide-react";
 import { listings, formatPrice } from "../../lib/demo-data";
 import { Button } from "../../components/ui";

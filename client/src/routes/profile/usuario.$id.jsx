@@ -1,4 +1,4 @@
-import { useParams } from "../../lib/navigation";
+import { useParams } from "../../hooks/useNavigation";
 import { MessageCircle, MapPin } from "lucide-react";
 import { listings } from "../../lib/demo-data";
 import { ListingCard } from "../../components/listing-card";

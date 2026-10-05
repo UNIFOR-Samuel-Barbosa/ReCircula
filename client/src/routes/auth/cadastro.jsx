@@ -1,4 +1,5 @@
-import { Link, useNavigate } from "../../lib/navigation";
+import { Link } from "../../components/link";
+import { useNavigate } from "../../hooks/useNavigation";
 import { Button, Field, Input } from "../../components/ui";
 import { useDemoSession } from "../../lib/demo-session";
 export default function Page() {

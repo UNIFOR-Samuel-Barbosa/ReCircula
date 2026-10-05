@@ -1,10 +1,9 @@
-
 import { useState } from "react";
 import { Camera, Edit3, LogOut } from "lucide-react";
 import { currentUser, listings } from "../../lib/demo-data";
 import { ListingCard } from "../../components/listing-card";
 import { Button, Field, Input, Textarea } from "../../components/ui";
-import { useNavigate } from "../../lib/navigation";
+import { useNavigate } from "../../hooks/useNavigation";
 import { useDemoSession } from "../../lib/demo-session";
 export default function Page() {
 	const nav = useNavigate();

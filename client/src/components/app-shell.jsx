@@ -1,15 +1,17 @@
-import { Link } from "../lib/navigation";
+import { Link } from "./link";
 import { Home, LayoutGrid, Plus, UserRound, LogIn } from "lucide-react";
 import { Button } from "./ui";
 import { useDemoSession } from "../lib/demo-session";
 import { ProfileMenu } from "./profile-menu";
 import recirculaLogo from "../assets/recircula-logo.png";
+
 const nav = [
 	{ to: "/", label: "Explorar", icon: Home },
 	{ to: "/painel", label: "Meus anúncios", icon: LayoutGrid },
 	{ to: "/publicar", label: "Publicar", icon: Plus },
 	{ to: "/perfil", label: "Perfil", icon: UserRound },
 ];
+
 export function AppShell({ children }) {
 	const { isLoggedIn } = useDemoSession();
 	return (
@@ -39,7 +41,7 @@ export function AppShell({ children }) {
 								key={to}
 								to={to}
 								activeOptions={{ exact: to === "/" }}
-								className="rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground [&.active]:bg-accent [&.active]:text-foreground"
+								className="rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground [&.active]:bg-accent [&.active]:text-foreground text-center"
 							>
 								{label}
 							</Link>
