@@ -1,13 +1,19 @@
-import { Link } from "./link";
-import { Home, LayoutGrid, Plus, UserRound, LogIn } from "lucide-react";
 import { Button } from "./ui";
-import { useDemoSession } from "../lib/demo-session";
+import { Link } from "./link";
 import { ProfileMenu } from "./profile-menu";
+import { useDemoSession } from "../lib/demo-session";
+import { Home, LayoutGrid, Plus, UserRound, LogIn } from "lucide-react";
+
 import recirculaLogo from "../assets/recircula-logo.png";
 
 const nav = [
 	{ to: "/", label: "Explorar", icon: Home },
-	{ to: "/painel", label: "Meus anúncios", icon: LayoutGrid },
+	{
+		to: "/painel",
+		label: "Meus anúncios",
+		mobileLabel: "Painel",
+		icon: LayoutGrid,
+	},
 	{ to: "/publicar", label: "Publicar", icon: Plus },
 	{ to: "/perfil", label: "Perfil", icon: UserRound },
 ];
@@ -66,12 +72,14 @@ export function AppShell({ children }) {
 					</div>
 				</div>
 			</header>
+
 			<main className="pb-24 md:pb-10">{children}</main>
+			
 			<nav
 				className="fixed inset-x-0 bottom-0 z-50 grid h-18 grid-cols-4 border-t border-border bg-background/95 px-2 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl md:hidden"
 				aria-label="Navegação móvel"
 			>
-				{nav.map(({ to, label, icon: Icon }) => (
+				{nav.map(({ to, label, mobileLabel, icon: Icon }) => (
 					<Link
 						key={to}
 						to={to}
@@ -79,7 +87,9 @@ export function AppShell({ children }) {
 						className="flex flex-col items-center justify-center gap-1 text-[11px] font-medium text-muted-foreground [&.active]:text-primary"
 					>
 						<Icon className="size-5" />
-						{label}
+						<span className="w-full whitespace-nowrap text-center">
+							{mobileLabel ?? label}
+						</span>
 					</Link>
 				))}
 			</nav>
