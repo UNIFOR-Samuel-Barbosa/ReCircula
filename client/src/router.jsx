@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect, useState } from "react";
 import { AppShell } from "./components/app-shell";
-import { Link, NavigationProvider } from "./lib/navigation";
+import { Link } from "./components/link";
+import { NavigationProvider } from "./context/NavigationContext";
 
 const routes = [
 	{

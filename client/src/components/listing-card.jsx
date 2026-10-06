@@ -1,4 +1,4 @@
-import { Link } from "../lib/navigation";
+import { Link } from "./link";
 import { Gift, MapPin } from "lucide-react";
 import { formatPrice } from "../lib/demo-data";
 export function ListingCard({ item }) {

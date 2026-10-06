@@ -1,4 +1,5 @@
-import { Link, useNavigate } from "../../lib/navigation";
+import { Link } from "../../components/link";
+import { useNavigate } from "../../hooks/useNavigation";
 import { useState } from "react";
 import { ArrowRight, KeyRound, Mail } from "lucide-react";
 import { Button, Field, Input } from "../../components/ui";

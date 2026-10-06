@@ -1,4 +1,4 @@
-import { Link } from "../../lib/navigation";
+import { Link } from "../../components/link";
 import { useMemo, useState } from "react";
 import { Edit3, Plus, Search, Trash2 } from "lucide-react";
 import { listings, currentUser, formatPrice } from "../../lib/demo-data";

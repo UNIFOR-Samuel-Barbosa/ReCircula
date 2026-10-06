@@ -1,4 +1,4 @@
-import { useNavigate } from "../../lib/navigation";
+import { useNavigate } from "../../hooks/useNavigation";
 import { useState } from "react";
 import { Gift, ImagePlus } from "lucide-react";
 import { Button, Field, Input, Select, Textarea } from "../../components/ui";
