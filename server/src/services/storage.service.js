@@ -27,7 +27,7 @@ export async function uploadImage(file) {
 			const stream = cloudinary.uploader.upload_stream(
 				{
 					resource_type: "image",
-					folder: "campusloop",
+					folder: "recircula",
 				},
 				(error, result) => {
 					if (error) {
