@@ -1,16 +1,19 @@
 {
-  "name": "server",
-  "version": "1.0.0",
-  "description": "api-recircula",
-  "license": "ISC",
-  "author": "",
-  "type": "commonjs",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+	"name": "server",
+	"version": "1.0.0",
+	"description": "api-recircula",
+	"license": "ISC",
+	"author": "",
+	"type": "commonjs",
+	"main": "index.js",
+  
+	"scripts": {
+		"dev": "vite node src/server.ts",
+		"build": "vite build",
+		"start": "node src/server.js"
+	},
 
-  "dependencies": {
+	"dependencies": {
 		"@supabase/supabase-js": "^2.110.7",
 		"cloudinary": "^2.10.1",
 		"cors": "^2.8.6",
