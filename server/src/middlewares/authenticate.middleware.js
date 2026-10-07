@@ -1,14 +1,8 @@
-import type { Request, Response, NextFunction } from "express";
-
 import { supabase } from "../config/supabase.js";
 
 import { AppError } from "../utils/AppError.js";
 
-export async function authenticate(
-	req: Request,
-	_res: Response,
-	next: NextFunction
-) {
+export async function authenticate(req, _res, next) {
 	try {
 		const authorization = req.headers.authorization;
 
@@ -44,3 +38,4 @@ export async function authenticate(
 		throw error;
 	}
 }
+

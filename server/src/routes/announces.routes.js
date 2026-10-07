@@ -1,12 +1,11 @@
 import { Router } from "express";
 
-import { authenticate } from "../middlewares/authenticate.middleware.ts.js";
+import { authenticate } from "../middlewares/authenticate.middleware.js";
 import { validate } from "../middlewares/validate.middleware.js";
 
 import * as announceController from "../controllers/announce.controller.js";
 
-import { createAnnounceSchema } from "../schemas/announce.schema.js";
-import { updateAnnounceSchema } from "../schemas/announce.schema.js";
+import { createAnnounceSchema, updateAnnounceSchema } from "../schemas/announce.schema.js";
 
 const router = Router();
 
@@ -39,3 +38,4 @@ router.patch(
 router.delete("/:id", authenticate, announceController.remove);
 
 export default router;
+

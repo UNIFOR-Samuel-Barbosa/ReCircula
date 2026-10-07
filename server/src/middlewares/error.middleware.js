@@ -1,13 +1,6 @@
-import type { Request, Response, NextFunction } from "express";
-
 import { AppError } from "../utils/AppError.js";
 
-export function errorMiddleware(
-	error: Error,
-	_req: Request,
-	res: Response,
-	_next: NextFunction
-) {
+export function errorMiddleware(error, _req, res, _next) {
 	if (error instanceof AppError) {
 		return res.status(error.statusCode).json({
 			error: error.message,
@@ -20,3 +13,4 @@ export function errorMiddleware(
 		error: "Erro interno do servidor.",
 	});
 }
+

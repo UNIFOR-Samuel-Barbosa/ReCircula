@@ -12,3 +12,4 @@ export const announceFiltersSchema = z.object({
 		.enum(["recent", "price-asc", "price-desc", ""])
 		.default(""),
 });
+

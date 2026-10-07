@@ -1,14 +1,6 @@
 import { supabase } from "../config/supabase.js";
 
-import type {
-	Announce,
-	AnnounceFilters,
-	CreateAnnounceDTO,
-	UpdateAnnounceDTO,
-	CategoryRow,
-} from "../types/announce.types.js";
-
-export async function findAll(filters: AnnounceFilters) {
+export async function findAll(filters) {
 	let query = supabase.from("announces").select(`
 		*,
 		user:profiles(
@@ -60,7 +52,7 @@ export async function findAll(filters: AnnounceFilters) {
 	return data;
 }
 
-export async function findById(id: string) {
+export async function findById(id) {
 	const { data, error } = await supabase
 		.from("announces")
 		.select("*")
@@ -72,7 +64,7 @@ export async function findById(id: string) {
 	return data;
 }
 
-export async function findByUserId(userId: string) {
+export async function findByUserId(userId) {
 	const { data, error } = await supabase
 		.from("announces")
 		.select(
@@ -93,7 +85,7 @@ export async function findByUserId(userId: string) {
 	return data;
 }
 
-export async function findCategories(userId?: string) {
+export async function findCategories(userId) {
 	let query = supabase
 		.from("announces")
 		.select("category");
@@ -102,14 +94,14 @@ export async function findCategories(userId?: string) {
 		query = query.eq("user_id", userId);
 	}
 
-	const { data, error } = await query.overrideTypes<CategoryRow[]>();
+	const { data, error } = await query;
 
 	if (error) throw error;
 
 	return [...new Set(data.map(item => item.category))];
 }
 
-export async function create(data: CreateAnnounceDTO) {
+export async function create(data) {
 	const { data: announce, error } = await supabase
 		.from("announces")
 		.insert(data)
@@ -121,7 +113,7 @@ export async function create(data: CreateAnnounceDTO) {
 	return announce;
 }
 
-export async function update(id: string, data: UpdateAnnounceDTO) {
+export async function update(id, data) {
 	const { data: announce, error } = await supabase
 		.from("announces")
 		.update(data)
@@ -134,8 +126,9 @@ export async function update(id: string, data: UpdateAnnounceDTO) {
 	return announce;
 }
 
-export async function remove(id: string) {
+export async function remove(id) {
 	const { error } = await supabase.from("announces").delete().eq("id", id);
 
 	if (error) throw error;
 }
+

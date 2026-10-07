@@ -1,8 +1,6 @@
 import { supabase } from "../config/supabase.js";
 
-import type { Profile, UpdateProfileDTO } from "../types/profile.types.js";
-
-export async function findById(id: string) {
+export async function findById(id) {
 	const { data, error } = await supabase
 		.from("profiles")
 		.select("*")
@@ -11,10 +9,10 @@ export async function findById(id: string) {
 
 	if (error) throw error;
 
-	return data as Profile;
+	return data;
 }
 
-export async function update(id: string, data: UpdateProfileDTO) {
+export async function update(id, data) {
 	const { data: profile, error } = await supabase
 		.from("profiles")
 		.update(data)
@@ -24,5 +22,6 @@ export async function update(id: string, data: UpdateProfileDTO) {
 
 	if (error) throw error;
 
-	return profile as Profile;
+	return profile;
 }
+

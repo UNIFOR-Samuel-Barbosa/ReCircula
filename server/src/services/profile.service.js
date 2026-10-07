@@ -1,10 +1,8 @@
 import * as profileRepository from "../repositories/profile.repository.js";
 
-import type { UpdateProfileDTO } from "../types/profile.types.js";
-
 import { AppError } from "../utils/AppError.js";
 
-export async function findById(id: string) {
+export async function findById(id) {
 	const profile = await profileRepository.findById(id);
 
 	if (!profile) {
@@ -14,8 +12,9 @@ export async function findById(id: string) {
 	return profile;
 }
 
-export async function update(id: string, data: UpdateProfileDTO) {
+export async function update(id, data) {
 	const profile = await findById(id);
 
 	return profileRepository.update(profile.id, data);
 }
+

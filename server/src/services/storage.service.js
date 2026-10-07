@@ -9,7 +9,7 @@ const MAX_FILE_SIZE = MAX_MB_FILE_SIZE * 1024 * 1024;
 
 const ALLOWED_TYPES = ["image/png", "image/jpeg", "image/webp"];
 
-export async function uploadImage(file: Express.Multer.File) {
+export async function uploadImage(file) {
 	if (!file) {
 		throw new AppError("Imagem não enviada.");
 	}
@@ -23,9 +23,7 @@ export async function uploadImage(file: Express.Multer.File) {
 	}
 
 	try {
-		const result = await new Promise<{
-			secure_url: string;
-		}>((resolve, reject) => {
+		const result = await new Promise((resolve, reject) => {
 			const stream = cloudinary.uploader.upload_stream(
 				{
 					resource_type: "image",
@@ -42,7 +40,7 @@ export async function uploadImage(file: Express.Multer.File) {
 						return;
 					}
 
-					resolve(result as { secure_url: string });
+					resolve(result);
 				}
 			);
 
@@ -59,3 +57,4 @@ export async function uploadImage(file: Express.Multer.File) {
 		throw new AppError("Não foi possível enviar a imagem.", 500);
 	}
 }
+

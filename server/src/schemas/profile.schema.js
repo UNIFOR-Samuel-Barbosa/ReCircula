@@ -6,3 +6,4 @@ export const updateProfileSchema = z.object({
 	biography: z.string().max(500).nullable().optional(),
 	telephone: z.string().max(20).nullable().optional(),
 });
+

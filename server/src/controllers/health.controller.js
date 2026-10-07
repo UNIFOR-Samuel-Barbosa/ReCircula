@@ -1,8 +1,6 @@
-import type { Request, Response } from "express";
-
 import * as healthService from "../services/health.service.js";
 
-export async function keepalive(_req: Request, res: Response) {
+export async function keepalive(_req, res) {
 	try {
 		await healthService.checkDatabaseConnection();
 
@@ -25,3 +23,4 @@ export async function keepalive(_req: Request, res: Response) {
 		});
 	}
 }
+
