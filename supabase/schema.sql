@@ -4,6 +4,10 @@ create table profiles (
     photo_url text,
     biography text,
     telephone text check(length(telephone) <= 20),
+
+    role text not null default 'user'
+        check (role in ('user', 'admin')),
+
     created_at timestamptz default now()
 );
 
