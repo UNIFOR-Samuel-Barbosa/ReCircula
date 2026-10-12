@@ -1,3 +1,31 @@
+-- Usuário de demonstração (login: demo@recircula.com / senha: recircula123).
+-- A senha é gravada com bcrypt pelo pgcrypto, no mesmo formato usado pela API.
+
+insert into profiles
+(
+id,
+email,
+password_hash,
+name,
+biography
+)
+
+values
+
+(
+'00000000-0000-4000-8000-000000000001',
+
+'demo@recircula.com',
+
+crypt('recircula123', gen_salt('bf', 10)),
+
+'Usuário Demo',
+
+'Conta de demonstração do ReCircula.'
+);
+
+-- =======================
+
 insert into announces
 (
 id,
@@ -14,7 +42,7 @@ values
 (
 gen_random_uuid(),
 
-'UUID_DO_SEU_USUARIO',
+'00000000-0000-4000-8000-000000000001',
 
 'Livro de Algoritmos',
 
@@ -45,7 +73,7 @@ values
 (
 gen_random_uuid(),
 
-'UUID_DO_SEU_USUARIO',
+'00000000-0000-4000-8000-000000000001',
 
 'Calculadora Casio',
 
@@ -76,7 +104,7 @@ values
 (
 gen_random_uuid(),
 
-'UUID_DO_SEU_USUARIO',
+'00000000-0000-4000-8000-000000000001',
 
 'Jaleco do Tony Stark',
 
@@ -107,7 +135,7 @@ values
 (
 gen_random_uuid(),
 
-'UUID_DO_SEU_USUARIO',
+'00000000-0000-4000-8000-000000000001',
 
 'Monitor LG',
 
@@ -138,7 +166,7 @@ values
 (
 gen_random_uuid(),
 
-'UUID_DO_SEU_USUARIO',
+'00000000-0000-4000-8000-000000000001',
 
 'Livro Code Clean',
 
@@ -169,7 +197,7 @@ values
 (
 gen_random_uuid(),
 
-'UUID_DO_SEU_USUARIO',
+'00000000-0000-4000-8000-000000000001',
 
 'Livro Crepúsculo: Vol. 1',
 
@@ -200,7 +228,7 @@ values
 (
 gen_random_uuid(),
 
-'UUID_DO_SEU_USUARIO',
+'00000000-0000-4000-8000-000000000001',
 
 'Livro Crepúsculo: Vol. 2',
 
@@ -231,7 +259,7 @@ values
 (
 gen_random_uuid(),
 
-'UUID_DO_SEU_USUARIO',
+'00000000-0000-4000-8000-000000000001',
 
 'Livro Crepúsculo: Vol. 3',
 
@@ -262,7 +290,7 @@ values
 (
 gen_random_uuid(),
 
-'UUID_DO_SEU_USUARIO',
+'00000000-0000-4000-8000-000000000001',
 
 'Livro Crepúsculo: Vol. 4',
 
@@ -293,7 +321,7 @@ values
 (
 gen_random_uuid(),
 
-'UUID_DO_SEU_USUARIO',
+'00000000-0000-4000-8000-000000000001',
 
 'Livro Crepúsculo: Vol. 5',
 
