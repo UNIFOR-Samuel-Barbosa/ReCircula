@@ -1,17 +1,10 @@
 # Contrato Inicial de Rotas — ReCircula
 
-Este documento descreve as rotas planejadas para a API REST do ReCircula. Rotas marcadas como autenticadas exigem `Authorization: Bearer <access_token>`, exceto a renovação, que usa o token de renovação. O backend gera JWT e verifica senhas armazenadas com bcrypt; o Supabase é utilizado como banco de dados, não como provedor de autenticação.
+Este documento descreve as rotas planejadas para a API REST do ReCircula. Rotas marcadas como autenticadas exigem um JWT emitido pelo Supabase Auth no cabeçalho `Authorization`. O cadastro, login, logout, renovação de sessão e recuperação de senha são realizados pelo Supabase Auth via SDK; o backend Express não implementa endpoints próprios de autenticação nem armazena senhas. Seu middleware valida o token e usa a identidade verificada para autorização.
 
 ## Autenticação e sessão
 
-| Método | Rota | Acesso | Entrada e finalidade |
-| --- | --- | --- | --- |
-| `POST` | `/auth/register` | Público | Recebe e-mail e senha; aceita qualquer endereço de e-mail válido, sem exigir domínio universitário; cria a conta e o perfil. |
-| `POST` | `/auth/login` | Público | Recebe e-mail e senha; verifica a senha com bcrypt e emite os tokens de sessão. |
-| `POST` | `/auth/logout` | Autenticado | Encerra a sessão e invalida o token de renovação associado. |
-| `POST` | `/auth/refresh` | Token de renovação | Renova o token de acesso a partir de um token de renovação válido. |
-| `POST` | `/auth/forgot-password` | Público | Recebe e-mail e inicia o envio de link/código de recuperação. A resposta não deve revelar se o e-mail está cadastrado. |
-| `POST` | `/auth/reset-password` | Token de recuperação | Recebe token/código e nova senha; atualiza a senha armazenada com bcrypt. |
+O frontend usa o SDK do Supabase Auth para cadastro com qualquer e-mail válido, login, logout, atualização da sessão e recuperação/redefinição de senha. Esses fluxos não são endpoints da API Express. Após validar o JWT em cada rota protegida, o backend obtém a identidade do usuário das claims verificadas; não deve confiar em um `user_id` enviado pelo cliente.
 
 ## Anúncios
 
@@ -45,6 +38,6 @@ Este documento descreve as rotas planejadas para a API REST do ReCircula. Rotas 
 - Usar o identificador do usuário autenticado para definir a propriedade de anúncios e perfis; não confiar em `user_id` enviado pelo cliente para operações de escrita.
 - Retornar erros HTTP semânticos. Entradas inválidas retornam `400`, falta de autenticação `401`, falta de autorização `403`, recurso inexistente `404`, erro interno `500` e indisponibilidade de serviço ou banco `503`.
 - Não retornar e-mail ou telefone de terceiros nas respostas de listagem de anúncios ou de consulta de perfil.
-- Manter credenciais do banco, segredo JWT e credenciais dos serviços externos em variáveis de ambiente do backend.
+- Manter chaves privilegiadas do Supabase e credenciais de serviços externos em variáveis de ambiente do servidor; nunca expor `service_role`/secret no frontend. A chave publicável usada pelo frontend não substitui políticas RLS.
 
-Os nomes e formatos finais dos payloads, a política de expiração dos tokens e os detalhes do armazenamento/invalidação de tokens de renovação devem ser definidos durante a implementação, mantendo os requisitos de segurança descritos acima.
+O Supabase Auth controla a expiração e a renovação de sessão. O backend deve verificar JWTs conforme a configuração de chaves do projeto, usando uma biblioteca ou mecanismo suportado, e não deve compartilhar ou armazenar a chave privada de assinatura.
