@@ -1,82 +1,9 @@
-import { lazy, Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { AppShell } from "./components/app-shell";
 import { Link } from "./components/link";
 import { NavigationProvider } from "./context/NavigationContext";
-
-const routes = [
-	{
-		path: "/",
-		title: "Explorar — ReCircula",
-		Component: lazy(() => import("./routes/marketplace/index.jsx")),
-	},
-	{
-		path: "/entrar",
-		title: "Entrar — ReCircula",
-		Component: lazy(() => import("./routes/auth/entrar.jsx")),
-	},
-	{
-		path: "/cadastro",
-		title: "Criar conta — ReCircula",
-		Component: lazy(() => import("./routes/auth/cadastro.jsx")),
-	},
-	{
-		path: "/cadastro-admin",
-		title: "Cadastro de administrador — ReCircula",
-		Component: lazy(() => import("./routes/auth/cadastro-admin.jsx")),
-	},
-	{
-		path: "/dashboard",
-		title: "Dashboard administrativo — ReCircula",
-		Component: lazy(() => import("./routes/admin/dashboard.jsx")),
-	},
-	{
-		path: "/painel",
-		title: "Meus anúncios — ReCircula",
-		Component: lazy(() => import("./routes/profile/painel.jsx")),
-	},
-	{
-		path: "/perfil",
-		title: "Meu perfil — ReCircula",
-		Component: lazy(() => import("./routes/profile/perfil.jsx")),
-	},
-	{
-		path: "/usuario/:id",
-		title: "Perfil do estudante — ReCircula",
-		Component: lazy(() => import("./routes/profile/usuario.$id.jsx")),
-	},
-	{
-		path: "/publicar",
-		title: "Publicar anúncio — ReCircula",
-		Component: lazy(() => import("./routes/marketplace/publicar.jsx")),
-	},
-	{
-		path: "/anuncio/:id",
-		title: "Detalhes do anúncio — ReCircula",
-		Component: lazy(() => import("./routes/marketplace/anuncio.$id.jsx")),
-	},
-];
-
-export function matchRoute(pathname) {
-	const currentSegments = pathname.split("/").filter(Boolean);
-
-	for (const route of routes) {
-		const routeSegments = route.path.split("/").filter(Boolean);
-		if (routeSegments.length !== currentSegments.length) continue;
-
-		const params = {};
-		const matches = routeSegments.every((segment, index) => {
-			if (segment.startsWith(":")) {
-				params[segment.slice(1)] = decodeURIComponent(currentSegments[index]);
-				return true;
-			}
-			return segment === currentSegments[index];
-		});
-
-		if (matches) return { ...route, params };
-	}
-
-	return null;
-}
+import { matchRoute } from "./lib/routes";
+import { ToastProvider } from "./service/toast";
 
 export function AppRouter() {
 	const [pathname, setPathname] = useState(window.location.pathname);
@@ -121,6 +48,7 @@ export function AppRouter() {
 	return (
 		<NavigationProvider pathname={pathname} params={route?.params ?? {}}>
 			<AppShell>{page}</AppShell>
+			<ToastProvider />
 		</NavigationProvider>
 	);
 }
