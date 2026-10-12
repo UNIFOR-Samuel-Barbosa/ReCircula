@@ -1,0 +1,47 @@
+erDiagram
+
+    profiles {
+        uuid id PK
+        text email UK
+        text password_hash
+        text role
+        text name
+        text photo_url
+        text biography
+        text telephone
+        timestamptz created_at
+    }
+
+    announces {
+        uuid id PK
+        uuid user_id FK
+        text image_url
+        text title
+        text description
+        numeric price
+        bool donation
+        text category
+        timestamptz created_at
+    }
+
+    refresh_tokens {
+        uuid id PK
+        uuid user_id FK
+        text token_hash UK
+        timestamptz expires_at
+        timestamptz revoked_at
+        timestamptz created_at
+    }
+
+    password_resets {
+        uuid id PK
+        uuid user_id FK
+        text token_hash UK
+        timestamptz expires_at
+        timestamptz used_at
+        timestamptz created_at
+    }
+
+    profiles ||--o{ announces : "creates"
+    profiles ||--o{ refresh_tokens : "has sessions"
+    profiles ||--o{ password_resets : "requests"

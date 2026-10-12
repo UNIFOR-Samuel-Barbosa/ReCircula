@@ -8,7 +8,7 @@
 | --------------------------- | --------------------------------------------------------------------------------------- |
 | **Usuário não autenticado** | Visitante que acessa a landing page e pode navegar publicamente                         |
 | **Usuário autenticado**     | Estudante logado com acesso completo ao marketplace                                     |
-| **Backend (API REST)**      | Serviço intermediário que processa regras de negócio, valida JWTs do Supabase Auth e acessa os dados |
+| **Backend (API REST)**      | Serviço intermediário que processa regras de negócio, autenticação nativa (JWT) e dados |
 | **Cloudinary**              | Serviço externo de armazenamento e entrega de imagens                                   |
 
 ---
@@ -127,13 +127,13 @@
 
 ### RNF01 — Autenticação e segurança de tokens
 
-- A autenticação deve ser gerenciada pelo **Supabase Auth**, que emite JWTs para as sessões. O backend Node.js/Express deve validar a assinatura, a validade e as claims do token antes de autorizar rotas protegidas; não deve gerar JWTs próprios nem armazenar senhas ou hashes de senha.
+- A autenticação deve utilizar **JWT** (JSON Web Token) gerado e validado diretamente pelo próprio backend (Node.js/Express) com senhas criptografadas via **bcrypt**.
 - O token de acesso deve ser enviado no cabeçalho HTTP `Authorization: Bearer <token>` em todas as rotas protegidas.
-- A chave `service_role`/secret e as credenciais privilegiadas do Supabase devem permanecer exclusivamente em ambiente confiável de servidor e jamais ser expostas ao frontend. O frontend pode usar a chave publicável apropriada, com RLS habilitada e políticas testadas.
+- As credenciais de conexão ao banco de dados (Supabase/PostgreSQL) e a chave secreta do JWT devem permanecer **exclusivamente no backend** via variáveis de ambiente (`.env`) e jamais ser expostas ao frontend.
 
 ### RNF02 — Autorização e controle de acesso
 
-- O backend deve implementar middlewares de controle de acesso e autorização baseados no identificador do usuário validado no JWT emitido pelo Supabase Auth; as tabelas expostas também devem aplicar políticas RLS adequadas.
+- O backend deve implementar middlewares de controle de acesso e autorização baseados no identificador do usuário validado no token JWT.
 - Usuários só podem **atualizar e excluir** seus próprios anúncios e perfil.
 - Anúncios são legíveis por qualquer visitante, sem exigência de login.
 - A consulta de perfis exige autenticação; visitantes não autenticados não podem consultar perfis próprios ou de outros usuários.
