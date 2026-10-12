@@ -1,0 +1,65 @@
+import { createElement } from "react";
+import { Toaster, toast } from "sonner";
+
+const toastPalette = {
+	yellow: {
+		background: "#111827",
+		border: "#facc15",
+		color: "white",
+	},
+	green: {
+		background: "#111827",
+		border: "#22c55e",
+		color: "#14532d",
+	},
+	red: {
+		background: "#111827",
+		border: "#ef4444",
+		color: "#7f1d1d",
+	},
+	blue: {
+		background: "#111827",
+		border: "#3b82f6",
+		color: "#1e3a8a",
+	},
+};
+
+export function ToastProvider() {
+	return createElement(Toaster, {
+		position: "top-center", 
+		closeButton: true,
+		richColors: false,
+		toastOptions: {
+			classNames: {
+				toast:
+					"group toast border border-slate-200/80 shadow-[0_16px_38px_rgba(15,23,42,0.18)] rounded-xl px-4 py-3 text-base font-semibold",
+				closeButton:
+					"border-0 bg-transparent text-slate-700 hover:text-slate-950",
+				description: "text-sm font-medium",
+			},
+		},
+	});
+}
+
+export function showToast({
+	text,
+	color = "yellow",
+	duration = 5000,
+} = {}) {
+	if (!text) {
+		throw new Error("O texto do toast é obrigatório.");
+	}
+
+	const palette = toastPalette[color] ?? toastPalette.yellow;
+
+	return toast(text, {
+		duration,
+		className: "text-base font-semibold",
+		style: {
+			backgroundColor: palette.background,
+			borderLeft: `4px solid ${palette.border}`,
+			color: palette.color,
+			boxShadow: "0 16px 38px rgba(15, 23, 42, 0.18)",
+		},
+	});
+}
