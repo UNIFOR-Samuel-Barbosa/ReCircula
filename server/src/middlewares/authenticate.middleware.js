@@ -1,41 +1,19 @@
-import { supabase } from "../config/supabase.js";
+import { verifyAccessToken } from "../services/token.service.js";
 
 import { AppError } from "../utils/AppError.js";
 
-export async function authenticate(req, _res, next) {
-	try {
-		const authorization = req.headers.authorization;
+export function authenticate(req, _res, next) {
+	const [scheme, token] = req.headers.authorization?.split(" ") ?? [];
 
-		if (!authorization) {
-			throw new AppError("Token não informado.", 401);
-		}
-
-		const token = authorization.replace("Bearer ", "");
-
-		const {
-			data: { user },
-			error,
-		} = await supabase.auth.getUser(token);
-
-		if (error?.name === "AuthRetryableFetchError") {
-			throw new AppError("Falha temporária ao validar autenticação.", 503);
-		}
-
-		if (error) {
-			throw new AppError(error.message, 401);
-		}
-
-		if (!user) {
-			throw new AppError("Token inválido.", 401);
-		}
-
-		req.user = user;
-
-		next();
-	} catch (error) {
-		console.error("AUTH ERROR:", error);
-
-		throw error;
+	if (scheme !== "Bearer" || !token) {
+		throw new AppError("Token não informado.", 401);
 	}
-}
 
+	try {
+		req.user = verifyAccessToken(token);
+	} catch {
+		throw new AppError("Token inválido ou expirado.", 401);
+	}
+
+	next();
+}
