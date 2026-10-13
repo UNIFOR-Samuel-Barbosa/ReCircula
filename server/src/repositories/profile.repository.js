@@ -73,3 +73,20 @@ export async function updatePassword(id, passwordHash) {
 
 	if (error) throw error;
 }
+
+export async function findAll() {
+	const { data, error } = await supabase
+		.from("profiles")
+		.select(PROFILE_COLUMNS)
+		.order("created_at", { ascending: false });
+
+	if (error) throw error;
+
+	return data;
+}
+
+export async function remove(id) {
+	const { error } = await supabase.from("profiles").delete().eq("id", id);
+
+	if (error) throw error;
+}

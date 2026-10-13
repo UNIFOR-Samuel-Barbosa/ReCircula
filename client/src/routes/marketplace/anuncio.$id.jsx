@@ -1,13 +1,63 @@
+import { useEffect, useState } from "react";
 import { Link } from "../../components/link";
 import { useParams } from "../../hooks/useNavigation";
-import { ArrowLeft, MessageCircle, MapPin, ShieldCheck } from "lucide-react";
+import { ArrowLeft, MessageCircle, MapPin, ShieldCheck, Loader2 } from "lucide-react";
 import { listings, formatPrice } from "../../lib/demo-data";
 import { Button } from "../../components/ui";
+import { announceApi } from "../../services/api";
+
 export default function Page() {
 	const { id } = useParams();
-	const item = listings.find((x) => x.id === id) ?? listings.at(0);
-	if (!item)
+	const [item, setItem] = useState(null);
+	const [loading, setLoading] = useState(true);
+
+	useEffect(() => {
+		announceApi
+			.getById(id)
+			.then((apiItem) => {
+				if (apiItem) {
+					setItem({
+						id: apiItem.id,
+						title: apiItem.title,
+						category: apiItem.category,
+						price: apiItem.price,
+						donation: apiItem.donation,
+						image: apiItem.image_url,
+						seller: apiItem.user?.name || "Estudante",
+						sellerId: apiItem.user_id,
+						course: apiItem.user?.telephone || "Estudante UNIFOR",
+						phone: apiItem.user?.telephone,
+						description: apiItem.description || "Sem descrição informada.",
+					});
+				} else {
+					const fallback = listings.find((x) => x.id === id) ?? listings.at(0);
+					setItem(fallback);
+				}
+			})
+			.catch(() => {
+				const fallback = listings.find((x) => x.id === id) ?? listings.at(0);
+				setItem(fallback);
+			})
+			.finally(() => {
+				setLoading(false);
+			});
+	}, [id]);
+
+	if (loading) {
+		return (
+			<div className="flex min-h-[50vh] items-center justify-center p-10">
+				<Loader2 className="size-8 animate-spin text-primary" />
+			</div>
+		);
+	}
+
+	if (!item) {
 		return <div className="p-10 text-center">Anúncio indisponível.</div>;
+	}
+
+	const rawPhone = item.phone || "5585999991204";
+	const cleanPhone = rawPhone.replace(/\D/g, "");
+
 	return (
 		<div className="mx-auto max-w-6xl px-4 py-6 lg:px-8">
 			<Link
@@ -66,7 +116,9 @@ export default function Page() {
 					</div>
 					<a
 						className="mt-6"
-						href={`https://wa.me/5585999991204?text=${encodeURIComponent(`Olá! Vi o anúncio “${item.title}” no ReCircula.`)}`}
+						href={`https://wa.me/${cleanPhone}?text=${encodeURIComponent(
+							`Olá! Vi o anúncio “${item.title}” no ReCircula.`
+						)}`}
 						target="_blank"
 						rel="noreferrer"
 					>

@@ -1,7 +1,7 @@
 import { Button } from "./ui";
 import { Link } from "./link";
 import { ProfileMenu } from "./profile-menu";
-import { useDemoSession } from "../lib/demo-session";
+import { useAuth } from "../context/AuthContext";
 import { Home, LayoutGrid, Plus, UserRound, LogIn } from "lucide-react";
 
 import recirculaLogo from "../assets/recircula-logo.png";
@@ -19,7 +19,7 @@ const nav = [
 ];
 
 export function AppShell({ children }) {
-	const { isLoggedIn } = useDemoSession();
+	const { isLoggedIn } = useAuth();
 	return (
 		<div className="min-h-screen bg-background text-foreground">
 			<header className="sticky top-0 z-40 border-b border-border bg-background/90 backdrop-blur-xl">

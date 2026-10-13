@@ -1,17 +1,48 @@
-
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Search, SlidersHorizontal, Sparkles, Gift } from "lucide-react";
-import { categories, listings } from "../../lib/demo-data";
+import { categories as defaultCategories, listings as defaultListings } from "../../lib/demo-data";
 import { ListingCard } from "../../components/listing-card";
 import { Button, Input, Select } from "../../components/ui";
+import { announceApi } from "../../services/api";
+
 export default function Index() {
 	const [query, setQuery] = useState("");
 	const [category, setCategory] = useState("Todos");
 	const [donations, setDonations] = useState(false);
 	const [order, setOrder] = useState("recent");
+	const [apiListings, setApiListings] = useState([]);
+
+	useEffect(() => {
+		announceApi
+			.getAll()
+			.then((items) => {
+				if (Array.isArray(items) && items.length > 0) {
+					const mapped = items.map((x) => ({
+						id: x.id,
+						title: x.title,
+						category: x.category,
+						price: x.price,
+						donation: x.donation,
+						image: x.image_url,
+						seller: x.user?.name || "Estudante",
+						sellerId: x.user_id,
+						course: x.user?.telephone || "Estudante UNIFOR",
+						description: x.description,
+					}));
+					setApiListings(mapped);
+				}
+			})
+			.catch((err) => {
+				console.warn("Usando catálogo demonstrativo:", err.message);
+			});
+	}, []);
+
+	// Se a API retornou anúncios reais, usa eles; caso contrário, usa a vitrine padrão
+	const activeListings = apiListings.length > 0 ? apiListings : defaultListings;
+
 	const filtered = useMemo(
 		() =>
-			listings
+			activeListings
 				.filter(
 					(item) =>
 						item.title.toLowerCase().includes(query.toLowerCase()) &&
@@ -25,8 +56,9 @@ export default function Index() {
 							? (b.price ?? 0) - (a.price ?? 0)
 							: 0
 				),
-		[query, category, donations, order]
+		[activeListings, query, category, donations, order]
 	);
+
 	return (
 		<>
 			<section className="border-b border-border">
@@ -64,7 +96,7 @@ export default function Index() {
 			<section className="mx-auto max-w-7xl px-4 py-8 lg:px-8">
 				<div className="mb-7 flex flex-col gap-5">
 					<div className="flex gap-2 overflow-x-auto pb-1">
-						{categories.map((item) => (
+						{defaultCategories.map((item) => (
 							<Button
 								key={item}
 								size="sm"

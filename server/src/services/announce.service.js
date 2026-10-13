@@ -2,14 +2,14 @@ import * as announceRepository from "../repositories/announce.repository.js";
 
 import { AppError } from "../utils/AppError.js";
 
-async function getOwnedAnnounce(announceId, userId) {
+async function getOwnedAnnounce(announceId, userId, userRole) {
 	const announce = await announceRepository.findById(announceId);
 
 	if (!announce) {
 		throw new AppError("Anúncio não encontrado.", 404);
 	}
 
-	if (announce.user_id !== userId) {
+	if (announce.user_id !== userId && userRole !== "admin") {
 		throw new AppError(
 			"Você não tem permissão para modificar este anúncio.",
 			403
@@ -67,8 +67,8 @@ export async function update(announceId, userId, data) {
 	return announceRepository.update(announceId, data);
 }
 
-export async function remove(announceId, userId) {
-	await getOwnedAnnounce(announceId, userId);
+export async function remove(announceId, userId, userRole) {
+	await getOwnedAnnounce(announceId, userId, userRole);
 
 	await announceRepository.remove(announceId);
 }

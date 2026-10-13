@@ -22,6 +22,11 @@ export const routes = [
 		Component: lazy(() => import("../routes/auth/nova-senha.jsx")),
 	},
 	{
+		path: "/redefinir-senha",
+		title: "Redefinir senha — ReCircula",
+		Component: lazy(() => import("../routes/auth/nova-senha.jsx")),
+	},
+	{
 		path: "/cadastro",
 		title: "Criar conta — ReCircula",
 		Component: lazy(() => import("../routes/auth/cadastro.jsx")),

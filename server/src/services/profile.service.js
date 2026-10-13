@@ -18,3 +18,12 @@ export async function update(id, data) {
 	return profileRepository.update(profile.id, data);
 }
 
+export async function findAll() {
+	return profileRepository.findAll();
+}
+
+export async function remove(id) {
+	await findById(id);
+	await profileRepository.remove(id);
+}
+

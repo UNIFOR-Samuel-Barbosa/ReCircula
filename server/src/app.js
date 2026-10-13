@@ -12,9 +12,27 @@ import { errorMiddleware } from "./middlewares/error.middleware.js";
 
 const app = express();
 
+const allowedOrigins = [
+	"http://localhost:5173",
+	"http://127.0.0.1:5173",
+	process.env.FRONTEND_URL,
+	process.env.VERCEL_URL && `https://${process.env.VERCEL_URL}`,
+	process.env.VERCEL_URL,
+].filter(Boolean);
+
 app.use(
 	cors({
-		origin: ["http://localhost:5173", process.env.VERCEL_URL],
+		origin: (origin, callback) => {
+			if (
+				!origin ||
+				allowedOrigins.includes(origin) ||
+				origin.startsWith("http://localhost:") ||
+				origin.startsWith("http://127.0.0.1:")
+			) {
+				return callback(null, true);
+			}
+			return callback(null, true);
+		},
 		credentials: true,
 	})
 );

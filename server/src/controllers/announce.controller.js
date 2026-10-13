@@ -61,7 +61,7 @@ export async function update(req, res) {
 }
 
 export async function remove(req, res) {
-	await announceService.remove(req.params.id, req.user.id);
+	await announceService.remove(req.params.id, req.user.id, req.user.role);
 
 	res.status(204).send();
 }
