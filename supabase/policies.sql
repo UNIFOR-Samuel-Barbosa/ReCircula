@@ -77,3 +77,25 @@ on public.announces
 for delete
 to authenticated
 using ((select private.is_admin()));
+-- Autenticação própria da API (backend/auth)
+-- Tabelas de sessão e recuperação de senha: só o backend (service role) acessa.
+alter table refresh_tokens enable row level security;
+
+alter table password_resets enable row level security;
+
+-- profiles agora guarda email e password_hash. A policy pública acima continua
+-- valendo, mas a chave pública só pode ler as colunas de apresentação/contato.
+revoke select on table public.profiles
+from anon, authenticated;
+
+grant select (
+    id,
+    name,
+    photo_url,
+    biography,
+    telephone,
+    role,
+    created_at
+)
+on table public.profiles
+to anon, authenticated;

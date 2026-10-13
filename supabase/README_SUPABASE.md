@@ -31,8 +31,10 @@ O arquivo `reset.sql` pode ser utilizado durante o desenvolvimento para remover 
 
 Responsável por criar toda a estrutura do banco de dados:
 
-- tabela `profiles`;
+- tabela `profiles` (inclui `email` e `password_hash`, usados pelo login da API);
 - tabela `announces`;
+- tabela `refresh_tokens` (sessões da API);
+- tabela `password_resets` (links de recuperação de senha);
 - relacionamentos;
 - chaves primárias;
 - chaves estrangeiras;
@@ -50,7 +52,7 @@ Mesmo utilizando a **Service Role Key** no backend, manter as policies documenta
 
 ### `seed.sql`
 
-Insere registros de exemplo para facilitar testes durante o desenvolvimento.
+Insere registros de exemplo para facilitar testes durante o desenvolvimento, incluindo um usuário de demonstração (`demo@recircula.com` / `recircula123`) dono dos anúncios.
 
 Este arquivo é opcional e pode ser executado quantas vezes forem necessárias após limpar o banco.
 
@@ -73,6 +75,8 @@ SUPABASE_URL=
 SUPABASE_SERVICE_ROLE_KEY=
 PORT=3001
 ```
+
+As variáveis de autenticação (`JWT_SECRET`, `ADMIN_SIGNUP_CODE`, etc.) estão descritas em `server/.env.example`.
 
 A **Service Role Key** deve permanecer exclusivamente no backend e **nunca** ser exposta ao frontend.
 

@@ -10,15 +10,49 @@ http://localhost:3001
 
 # Autenticação
 
-As rotas protegidas utilizam o Access Token do Supabase.
+A API gera e valida os próprios tokens (JWT + bcrypt). O Supabase é usado apenas como banco de dados.
 
-Enviar no header:
+- **Access token** (JWT, 15 min): enviar em todas as rotas protegidas.
+- **Refresh token** (opaco, 7 dias): usado apenas em `/auth/refresh` e `/auth/logout`. A cada renovação, o token antigo é invalidado e um novo par é devolvido; guarde sempre o último.
 
-Authorization: Bearer <access_token>
+Header das rotas protegidas:
 
-Exemplo:
+Authorization: Bearer <accessToken>
 
-Authorization: Bearer eyJhbGciOiJIUzI1NiIs...
+Quando uma rota protegida responder `401`, o frontend deve chamar `/auth/refresh` uma vez e repetir a requisição. Se a renovação também falhar, redirecionar para o login. Evite disparar várias renovações em paralelo: reutilizar um refresh token já trocado encerra todas as sessões do usuário.
+
+## Rotas de autenticação
+
+| Método | Rota | Body | Resposta |
+| --- | --- | --- | --- |
+| `POST` | `/auth/register` | `{ name, email, password }` | `201` sessão |
+| `POST` | `/auth/register-admin` | `{ name, email, password, accessCode }` | `201` sessão (`role: "admin"`) |
+| `POST` | `/auth/login` | `{ email, password }` | `200` sessão |
+| `POST` | `/auth/refresh` | `{ refreshToken }` | `200` sessão (novo par de tokens) |
+| `POST` | `/auth/logout` | `{ refreshToken }` | `204` |
+| `POST` | `/auth/forgot-password` | `{ email }` | `200` `{ message }` (mesma resposta exista ou não o e-mail) |
+| `POST` | `/auth/reset-password` | `{ token, password }` | `204` |
+
+Senha: 8 a 72 caracteres. O link de recuperação aponta para `${FRONTEND_URL}/redefinir-senha?token=...` e expira em 30 minutos; após a redefinição, todas as sessões do usuário são encerradas.
+
+Sessão:
+
+```json
+{
+	"user": {
+		"id": "...",
+		"email": "ana@example.com",
+		"role": "user",
+		"name": "Ana",
+		"photo_url": null,
+		"biography": null,
+		"telephone": null,
+		"created_at": "2026-10-08T18:00:00Z"
+	},
+	"accessToken": "eyJhbGciOiJIUzI1NiIs...",
+	"refreshToken": "q3Jx..."
+}
+```
 
 ---
 
@@ -174,6 +208,8 @@ Exemplo de Resposta:
 
 - Express
 - TypeScript
+- JWT + bcrypt
+- Resend
 - Supabase
 - PostgreSQL
 - Zod

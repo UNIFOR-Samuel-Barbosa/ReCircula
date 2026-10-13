@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import "dotenv/config";
 
+import authRoutes from "./routes/auth.routes.js";
 import announceRoutes from "./routes/announces.routes.js";
 import profileRoutes from "./routes/profiles.routes.js";
 import uploadRoutes from "./routes/upload.routes.js";
@@ -20,6 +21,7 @@ app.use(
 
 app.use(express.json());
 
+app.use("/auth", authRoutes);
 app.use("/announces", announceRoutes);
 app.use("/profiles", profileRoutes);
 app.use("/upload", uploadRoutes);

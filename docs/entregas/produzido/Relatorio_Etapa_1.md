@@ -45,7 +45,7 @@ O ReCircula facilita a descoberta de itens e o contato entre os usuários. Pagam
 | --------------------------- | --------------------------------------------------------------------------------------------------------------- |
 | **Usuário não autenticado** | Visitante que acessa a landing page e pode navegar pela vitrine pública de anúncios. Não pode consultar perfis. |
 | **Usuário autenticado**     | Pessoa com sessão ativa e acesso às operações protegidas do marketplace.                                        |
-| **Backend (API REST)**      | Serviço intermediário que processa regras de negócio, valida JWTs do Supabase Auth e acessa os dados.           |
+| **Backend (API REST)**      | Serviço intermediário que processa regras de negócio, autenticação própria com JWT e acesso aos dados.          |
 | **Cloudinary**              | Serviço externo de armazenamento e entrega de imagens.                                                          |
 
 ### 3.2 Requisitos Funcionais
@@ -160,9 +160,9 @@ O ReCircula facilita a descoberta de itens e o contato entre os usuários. Pagam
 
 #### RNF01 — Autenticação e segurança de tokens
 
-- A autenticação deve ser gerenciada pelo **Supabase Auth**, que emite JWTs para as sessões. O backend Node.js/Express valida os tokens antes de autorizar rotas protegidas; o ReCircula não gera JWTs próprios nem armazena senhas ou hashes de senha.
+- A autenticação deve utilizar **JWT** (JSON Web Token) gerado e validado diretamente pelo próprio backend (Node.js/Express) com senhas criptografadas via **bcrypt**.
 - O token de acesso deve ser enviado no cabeçalho HTTP `Authorization: Bearer <token>` em todas as rotas protegidas.
-- A chave `service_role`/secret e as credenciais privilegiadas do Supabase devem permanecer exclusivamente em ambiente confiável de servidor e jamais ser expostas ao frontend. O frontend pode usar a chave publicável apropriada, com RLS habilitada e políticas testadas.
+- As credenciais de conexão ao banco de dados (Supabase/PostgreSQL) e a chave secreta do JWT devem permanecer **exclusivamente no backend** via variáveis de ambiente (`.env`) e jamais ser expostas ao frontend.
 
 #### RNF02 — Autorização e controle de acesso
 
@@ -430,7 +430,7 @@ A redefinição de senha e a consulta de perfil de outro usuário autenticado s�
 
 ## 6. Modelo de Dados
 
-O modelo relacional planejado possui duas entidades principais. Cada perfil pode publicar vários anúncios; cada anúncio pertence a um único perfil (`profiles 1:N announces`). O Supabase Auth mantém as identidades; `profiles.id` corresponde ao UUID da identidade (`auth.users.id`). A tabela `profiles` guarda dados de apresentação e contato, não credenciais ou hashes de senha.
+O modelo relacional planejado possui duas entidades principais. Cada perfil pode publicar vários anúncios; cada anúncio pertence a um único perfil (`profiles 1:N announces`). A senha é criptografada com bcrypt e armazenada no campo `password`; o Supabase é o serviço de banco de dados, não o provedor de autenticação.
 
 ### Diagrama Entidade-Relacionamento
 
@@ -441,6 +441,8 @@ O modelo relacional planejado possui duas entidades principais. Cada perfil pode
 | Campo        | Tipo        | Restrição e finalidade                                                                                                             |
 | ------------ | ----------- | ---------------------------------------------------------------------------------------------------------------------------------- |
 | `id`         | UUID        | Chave primária.                                                                                                                    |
+| `email`      | TEXT        | Obrigatório e único; pode ser qualquer e-mail válido.                                                                              |
+| `password`   | TEXT        | Obrigatório; armazena a senha criptografada com bcrypt.                                                                            |
 | `name`       | TEXT        | Nome do usuário.                                                                                                                   |
 | `photo_url`  | TEXT        | URL da foto de perfil; opcional.                                                                                                   |
 | `biography`  | TEXT        | Biografia; opcional, limitada a 150 caracteres.                                                                                    |
@@ -463,7 +465,7 @@ O modelo relacional planejado possui duas entidades principais. Cada perfil pode
 
 ## 7. Arquitetura e Tecnologias Planejadas
 
-A proposta é uma aplicação full-stack desacoplada, com frontend React consumindo uma API REST em Node.js/Express. O backend organiza responsabilidades em rotas, middlewares, controllers, services e repositórios. A API acessa o PostgreSQL hospedado no Supabase; o Supabase Auth gerencia identidades e sessões JWT, que são validadas pelo backend. Uploads passam pelo backend e são armazenados no Cloudinary.
+A proposta é uma aplicação full-stack desacoplada, com frontend React consumindo uma API REST em Node.js/Express. O backend organiza responsabilidades em rotas, middlewares, controllers, services e repositórios. A API acessa o PostgreSQL hospedado no Supabase; a autenticação é própria, usando JWT e bcrypt, e não é delegada ao Supabase Auth. Uploads passam pelo backend e são armazenados no Cloudinary.
 
 ```mermaid
 flowchart LR
@@ -484,19 +486,26 @@ flowchart LR
 | API          | Node.js e Express          | API REST e regras de negócio organizadas em camadas.                                          |
 | Validação    | Zod                        | Validação dos dados recebidos pelo backend.                                                   |
 | Persistência | PostgreSQL no Supabase     | Armazenamento relacional de perfis e anúncios.                                                |
-| Autenticação | Supabase Auth (JWT)        | O Supabase gerencia identidades, credenciais e sessões; o backend valida os JWTs emitidos pelo provedor. |
+| Autenticação | JWT e bcrypt               | O backend emite/valida tokens e verifica senhas criptografadas; não se utiliza Supabase Auth. |
 | Imagens      | Multer e Cloudinary        | Recepção dos arquivos e armazenamento de imagens na nuvem.                                    |
 | Hospedagem   | Vercel e Render            | Frontend na Vercel e API no Render; banco no Supabase.                                        |
 
-As chaves privilegiadas e credenciais de serviços devem permanecer em ambiente confiável de servidor, sem serem expostas ao frontend ou versionadas no repositório. A decisão de autenticação adotada está detalhada em [Auth.md](../../decisoes/Auth.md); as demais escolhas de tecnologia continuam sujeitas à validação durante a implementação.
+As credenciais e chaves secretas devem permanecer em variáveis de ambiente no backend, sem serem expostas ao frontend ou versionadas no repositório. As escolhas acima são as registradas no planejamento e ainda devem ser validadas na implementação.
 
 ## 8. API Planejada
 
-As rotas protegidas recebem um JWT emitido pelo Supabase Auth no cabeçalho `Authorization`. Os dados de propriedade são obtidos da identidade autenticada, não de um `user_id` enviado pelo cliente.
+As rotas protegidas utilizam `Authorization: Bearer <access_token>`, exceto `/auth/refresh`, que usa um token de renovação válido. Os dados de propriedade são obtidos da identidade autenticada, não de um `user_id` enviado pelo cliente.
 
 ### 8.1 Autenticação e sessão
 
-Os fluxos de cadastro, login, logout, renovação de sessão e recuperação/redefinição de senha são fornecidos pelo Supabase Auth via SDK, não por endpoints próprios `/auth/*` da API Express. O backend valida o JWT emitido pelo provedor nas rotas protegidas.
+| Método | Rota                    | Acesso               | Operação                                                               |
+| ------ | ----------------------- | -------------------- | ---------------------------------------------------------------------- |
+| `POST` | `/auth/register`        | Público              | Cadastro com qualquer e-mail válido e senha; criação de perfil.        |
+| `POST` | `/auth/login`           | Público              | Verificação de senha com bcrypt e emissão dos tokens de sessão.        |
+| `POST` | `/auth/logout`          | Autenticado          | Encerramento da sessão e invalidação do token de renovação associado.  |
+| `POST` | `/auth/refresh`         | Token de renovação   | Emissão de novo token de acesso a partir de token de renovação válido. |
+| `POST` | `/auth/forgot-password` | Público              | Solicitação de recuperação de senha por e-mail.                        |
+| `POST` | `/auth/reset-password`  | Token de recuperação | Redefinição de senha usando token/código enviado por e-mail.           |
 
 ### 8.2 Anúncios
 
@@ -528,7 +537,7 @@ Quando houver telefone cadastrado, a consulta do perfil poderá fornecer um link
 
 ### 8.5 Validação e erros
 
-As entradas são validadas no backend com Zod. Erros previstos usam códigos HTTP semânticos: `400` para entrada inválida, `401` para ausência de autenticação, `403` para falta de autorização, `404` para recurso inexistente, `500` para erro interno e `503` para indisponibilidade de banco ou serviço externo. Chaves privilegiadas do Supabase e credenciais externas ficam em variáveis de ambiente no servidor, nunca no frontend.
+As entradas são validadas no backend com Zod. Erros previstos usam códigos HTTP semânticos: `400` para entrada inválida, `401` para ausência de autenticação, `403` para falta de autorização, `404` para recurso inexistente, `500` para erro interno e `503` para indisponibilidade de banco ou serviço externo. Credenciais do banco, segredo JWT e credenciais externas ficam em variáveis de ambiente no backend.
 
 ## 9. Equipe e Responsabilidades
 
@@ -547,7 +556,7 @@ O plano prevê **quatro semanas (20 dias úteis)**, com acompanhamento diário e
 | Período                           | Atividades principais                                                                                                                                | Marco esperado                                                                                            |
 | --------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
 | Semana 1 — Fundação e contratos   | Estruturar React e Express, estabelecer validações e tratamento de erros, criar scripts SQL e alinhar o contrato inicial da API.                     | Aplicação e API inicializadas; banco reproduzível por scripts; contrato inicial alinhado.                 |
-| Semana 2 — Autenticação e vitrine | Integrar cadastro/login, sessão e recuperação do Supabase Auth; implementar listagem pública, busca, filtros, ordenação e interface da vitrine.                       | Visitante consulta anúncios filtrados; usuário consegue criar conta, autenticar-se e iniciar recuperação. |
+| Semana 2 — Autenticação e vitrine | Concluir cadastro/login, sessão e recuperação; implementar listagem pública, busca, filtros, ordenação e interface da vitrine.                       | Visitante consulta anúncios filtrados; usuário consegue criar conta, autenticar-se e iniciar recuperação. |
 | Semana 3 — Anúncios e perfis      | Implementar publicação e gestão de anúncios, dashboard, perfis, uploads e contato via WhatsApp.                                                      | Usuário autenticado publica e gerencia anúncios; perfis e imagens integrados.                             |
 | Semana 4 — Integração e entrega   | Realizar testes de integração e regressão, corrigir defeitos, validar scripts e responsividade, publicar serviços e preparar demonstração/relatório. | Frontend na Vercel, API no Render e banco Supabase; fluxos prioritários verificados em desktop e celular. |
 
