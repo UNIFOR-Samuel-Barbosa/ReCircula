@@ -10,17 +10,17 @@ const toastPalette = {
 	green: {
 		background: "#111827",
 		border: "#22c55e",
-		color: "#14532d",
+		color: "white",
 	},
 	red: {
 		background: "#111827",
 		border: "#ef4444",
-		color: "#7f1d1d",
+		color: "white",
 	},
 	blue: {
 		background: "#111827",
 		border: "#3b82f6",
-		color: "#1e3a8a",
+		color: "white",
 	},
 };
 
@@ -54,10 +54,13 @@ export function showToast({
 
 	return toast(text, {
 		duration,
-		className: "text-base font-semibold",
+		className: "text-2xl font-semibold",
 		style: {
 			backgroundColor: palette.background,
 			borderLeft: `4px solid ${palette.border}`,
+			borderTop: "transparent",
+			borderBottom: "transparent",
+			borderRight: "transparent",
 			color: palette.color,
 			boxShadow: "0 16px 38px rgba(15, 23, 42, 0.18)",
 		},

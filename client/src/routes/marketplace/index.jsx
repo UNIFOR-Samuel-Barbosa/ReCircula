@@ -1,6 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { Search, SlidersHorizontal, Sparkles, Gift } from "lucide-react";
-import { categories as defaultCategories, listings as defaultListings } from "../../lib/demo-data";
+import {
+	categories as defaultCategories,
+	listings as defaultListings,
+} from "../../lib/demo-data";
 import { ListingCard } from "../../components/listing-card";
 import { Button, Input, Select } from "../../components/ui";
 import { announceApi } from "../../services/api";
