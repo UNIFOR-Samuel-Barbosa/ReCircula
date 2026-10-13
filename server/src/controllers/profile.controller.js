@@ -18,3 +18,15 @@ export async function update(req, res) {
 	res.json(profile);
 }
 
+export async function getAll(req, res) {
+	const profiles = await profileService.findAll();
+
+	res.json(profiles);
+}
+
+export async function remove(req, res) {
+	await profileService.remove(req.params.id);
+
+	res.status(204).send();
+}
+

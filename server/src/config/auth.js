@@ -1,3 +1,5 @@
+import "dotenv/config";
+
 export const authConfig = {
 	jwtSecret: process.env.JWT_SECRET,
 	accessTokenExpiresIn: process.env.JWT_ACCESS_EXPIRES || "15m",

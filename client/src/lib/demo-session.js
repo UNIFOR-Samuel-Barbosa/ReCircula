@@ -1,30 +1,20 @@
-import { useSyncExternalStore } from "react";
-const SESSION_KEY = "recircula-demo-session";
-const SESSION_EVENT = "recircula-session-change";
-function readSession() {
-	if (typeof window === "undefined") return "signed-in";
-	const value = window.localStorage.getItem(SESSION_KEY);
-	return value === "signed-out" || value === "admin" ? value : "signed-in";
-}
-function subscribe(callback) {
-	window.addEventListener(SESSION_EVENT, callback);
-	window.addEventListener("storage", callback);
-	return () => {
-		window.removeEventListener(SESSION_EVENT, callback);
-		window.removeEventListener("storage", callback);
-	};
-}
-function updateSession(state) {
-	window.localStorage.setItem(SESSION_KEY, state);
-	window.dispatchEvent(new Event(SESSION_EVENT));
-}
+import { useAuth } from "../context/AuthContext";
+
+/**
+ * Hook de sessão integrado com a API real e autenticação JWT/bcrypt.
+ * Mantém compatibilidade com referências existentes de useDemoSession.
+ */
 export function useDemoSession() {
-	const state = useSyncExternalStore(subscribe, readSession, () => "signed-in");
+	const auth = useAuth();
 	return {
-		isLoggedIn: state !== "signed-out",
-		isAdmin: state === "admin",
-		signIn: () => updateSession("signed-in"),
-		signInAsAdmin: () => updateSession("admin"),
-		signOut: () => updateSession("signed-out"),
+		...auth,
+		isLoggedIn: auth.isLoggedIn,
+		isAdmin: auth.isAdmin,
+		user: auth.user,
+		signIn: auth.signIn,
+		signInAsAdmin: auth.signUpAdmin,
+		signOut: auth.signOut,
 	};
 }
+
+export { useAuth };

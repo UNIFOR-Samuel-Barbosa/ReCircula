@@ -6,7 +6,9 @@
 - Atenção ao estado atual: a interface usa dados e sessão demonstrativos; não foi encontrada integração ativa do cliente com a API. Não presuma que as telas persistem dados no backend.
 
 ## 2. Stack e ferramentas
-- Cliente: JavaScript/JSX, React 19, Vite 8, Tailwind CSS 4 e componentes próprios baseados em Radix UI.
+- Cliente: JavaScript/JSX (não TypeScript), React 19, Vite 8 e Tailwind CSS 4.
+- UI: componentes locais em `client/src/components/ui/` seguem o padrão Shadcn/ui, combinando Radix UI, Tailwind CSS e `class-variance-authority`; há também componentes próprios em `client/src/components/ui.jsx`. O CLI/pacote `shadcn` não está declarado nem há `components.json`; Shadcn/ui é usado como padrão/código de componentes, não como dependência de runtime.
+- Ícones e notificações usados pela aplicação: Lucide React e Sonner.
 - Servidor: JavaScript ES modules, Node.js e Express 5; Zod valida entradas.
 - Persistência: PostgreSQL no Supabase, acessado pelo servidor via `@supabase/supabase-js`.
 - Serviços: Cloudinary para imagens; Resend para e-mails de recuperação (opcional em desenvolvimento).
@@ -62,12 +64,13 @@
 - Leia apenas os documentos especializados relevantes para a tarefa; não assuma que a documentação substitui a verificação do código.
 
 ## 8. Lacunas e inconsistências conhecidas
+- O [Escopo_do_Sistema.md](./docs/arquitetura/relatorios/Escopo_do_Sistema.md) declara React, JavaScript e Shadcn e também chama a SPA de “tipada”; a implementação é JavaScript/JSX, sem TypeScript, e usa componentes no padrão Shadcn/ui. O escopo também cita Vercel/Render como hospedagem, mas não foi encontrada configuração de deploy que confirme uso ou publicação atual nessas plataformas.
 - O link de redefinição gerado pelo servidor usa `/redefinir-senha`, mas a rota atual do cliente é `/nova-senha`; o contrato deve ser alinhado antes de validar recuperação de senha ponta a ponta.
 - O contrato documenta rotas de perfil como `/profiles/me`; a implementação atual usa `GET /profiles` e `PATCH /profiles`, com busca pública por ID em `GET /profiles/:id`.
 - O contrato e alguns documentos descrevem fluxos que podem não estar conectados à interface demonstrativa. Confirme comportamento diretamente no código antes de depender deles.
 - A integração SPA/API, disponibilidade do banco e configuração real dos serviços externos não foram executadas/verificadas nesta atualização.
 
 ## 9. Manutenção deste documento
-- Última análise: 2026-10-12.
-- Áreas verificadas: manifests/scripts, estrutura principal, rotas do cliente e da API, autenticação, variáveis de ambiente pelo exemplo e código, schema SQL e documentação de arquitetura/autenticação.
+- Última análise: 2026-10-13.
+- Áreas verificadas: manifests/scripts, estrutura principal, rotas do cliente e da API, autenticação, variáveis de ambiente pelo exemplo e código, schema SQL, uso de componentes UI e declarações tecnológicas de [Escopo_do_Sistema.md](./docs/arquitetura/relatorios/Escopo_do_Sistema.md).
 - Não foi feita leitura exaustiva de todas as telas, endpoints, policies, requisitos ou fluxos de deploy; não foram executados build, lint ou testes.

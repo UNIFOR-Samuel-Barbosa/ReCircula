@@ -181,6 +181,7 @@ export async function forgotPassword(email) {
 	// Sem await: o tempo de resposta não deve depender do envio do e-mail.
 	mailService.sendPasswordResetEmail(user.email, link).catch((error) => {
 		console.error("Falha ao enviar e-mail de recuperação:", error);
+		console.info(`[mail dev fallback] Link de redefinição para ${user.email}: ${link}`);
 	});
 }
 
