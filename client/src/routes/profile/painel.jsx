@@ -6,7 +6,7 @@ import { Button, Input } from "../../components/ui";
 import { useAuth } from "../../context/AuthContext";
 import { announceApi } from "../../services/api";
 import { useNavigate } from "../../hooks/useNavigation";
-import { showToast } from "../../service/toast";
+import { showToast } from "../../services/toast";
 
 export default function Page() {
 	const nav = useNavigate();
@@ -44,9 +44,7 @@ export default function Page() {
 
 	const shown = useMemo(
 		() =>
-			items.filter((x) =>
-				x.title.toLowerCase().includes(query.toLowerCase())
-			),
+			items.filter((x) => x.title.toLowerCase().includes(query.toLowerCase())),
 		[items, query]
 	);
 
@@ -85,7 +83,8 @@ export default function Page() {
 						Meus anúncios
 					</h1>
 					<p className="mt-2 text-sm text-muted-foreground">
-						{items.length} anúncio{items.length === 1 ? "" : "s"} ativo{items.length === 1 ? "" : "s"}
+						{items.length} anúncio{items.length === 1 ? "" : "s"} ativo
+						{items.length === 1 ? "" : "s"}
 					</p>
 				</div>
 				<Link to="/publicar">
@@ -133,9 +132,7 @@ export default function Page() {
 								>
 									{item.title}
 								</Link>
-								<p className="mt-1 text-sm text-primary">
-									{formatPrice(item)}
-								</p>
+								<p className="mt-1 text-sm text-primary">{formatPrice(item)}</p>
 								<p className="mt-1 text-xs text-muted-foreground">
 									{item.category}
 								</p>
@@ -157,7 +154,8 @@ export default function Page() {
 							<Sparkles className="mx-auto size-8 text-primary" />
 							<p className="mt-2 font-semibold">Nenhum anúncio encontrado.</p>
 							<p className="mt-1 text-xs">
-								Publique materiais que você não usa mais para que outros estudantes possam aproveitar.
+								Publique materiais que você não usa mais para que outros
+								estudantes possam aproveitar.
 							</p>
 							<Link to="/publicar" className="mt-4 inline-block">
 								<Button size="sm">Publicar agora</Button>

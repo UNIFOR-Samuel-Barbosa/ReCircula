@@ -5,7 +5,7 @@ import { formatPrice } from "../../lib/demo-data";
 import { Button } from "../../components/ui";
 import { useAuth } from "../../context/AuthContext";
 import { profileApi, announceApi } from "../../services/api";
-import { showToast } from "../../service/toast";
+import { showToast } from "../../services/toast";
 
 export default function Page() {
 	const { isAdmin, isLoggedIn, isLoading } = useAuth();

@@ -6,7 +6,7 @@ import { useNavigate } from "../../hooks/useNavigation";
 import { Link } from "../../components/link";
 import { useAuth } from "../../context/AuthContext";
 import { announceApi } from "../../services/api";
-import { showToast } from "../../service/toast";
+import { showToast } from "../../services/toast";
 
 export default function Page() {
 	const nav = useNavigate();
@@ -175,7 +175,9 @@ export default function Page() {
 				) : (
 					<div className="mt-6 rounded-lg border border-dashed border-border py-12 text-center">
 						<Sparkles className="mx-auto size-8 text-primary" />
-						<p className="mt-3 font-semibold">Você ainda não publicou anúncios</p>
+						<p className="mt-3 font-semibold">
+							Você ainda não publicou anúncios
+						</p>
 						<p className="mt-1 text-sm text-muted-foreground">
 							Coloque seus materiais acadêmicos para circular agora mesmo!
 						</p>

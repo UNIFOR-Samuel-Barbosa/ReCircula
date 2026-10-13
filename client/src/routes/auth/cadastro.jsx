@@ -4,7 +4,7 @@ import { useNavigate } from "../../hooks/useNavigation";
 import { Loader2 } from "lucide-react";
 import { Button, Field, Input } from "../../components/ui";
 import { useAuth } from "../../context/AuthContext";
-import { showToast } from "../../service/toast";
+import { showToast } from "../../services/toast";
 
 export default function Page() {
 	const nav = useNavigate();

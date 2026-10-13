@@ -4,7 +4,7 @@ import { Link } from "./components/link";
 import { NavigationProvider } from "./context/NavigationContext";
 import { AuthProvider } from "./context/AuthContext";
 import { matchRoute } from "./lib/routes";
-import { ToastProvider } from "./service/toast";
+import { ToastProvider } from "./services/toast";
 
 export function AppRouter() {
 	const [pathname, setPathname] = useState(window.location.pathname);

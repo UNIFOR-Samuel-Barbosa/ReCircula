@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "../../components/link";
 import { useNavigate } from "../../hooks/useNavigation";
 import { Button, Field, Input } from "../../components/ui";
-import { showToast } from "../../service/toast";
+import { showToast } from "../../services/toast";
 import { authApi } from "../../services/api";
 import { AlertCircle, Loader2 } from "lucide-react";
 
@@ -116,7 +116,11 @@ export default function Page() {
 							</span>
 						)}
 					</Field>
-					<Button type="submit" className="w-full" disabled={loading || passwordsMismatch}>
+					<Button
+						type="submit"
+						className="w-full"
+						disabled={loading || passwordsMismatch}
+					>
 						{loading ? (
 							<>
 								<Loader2 className="size-4 animate-spin" />

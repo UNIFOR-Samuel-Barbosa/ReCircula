@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "../../components/link";
 import { Button, Field, Input } from "../../components/ui";
-import { showToast } from "../../service/toast";
+import { showToast } from "../../services/toast";
 import { authApi } from "../../services/api";
 import { Loader2, CheckCircle2 } from "lucide-react";
 
@@ -53,7 +53,10 @@ export default function Page() {
 							(Em ambiente local/desenvolvimento sem chave de e-mail, confira o
 							console do servidor).
 						</p>
-						<Link to="/entrar" className="mt-4 inline-block text-sm font-semibold text-primary">
+						<Link
+							to="/entrar"
+							className="mt-4 inline-block text-sm font-semibold text-primary"
+						>
 							Voltar ao login
 						</Link>
 					</div>

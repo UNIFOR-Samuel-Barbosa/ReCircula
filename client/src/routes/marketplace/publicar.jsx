@@ -4,7 +4,7 @@ import { Gift, ImagePlus, Loader2 } from "lucide-react";
 import { Button, Field, Input, Select, Textarea } from "../../components/ui";
 import { useAuth } from "../../context/AuthContext";
 import { announceApi } from "../../services/api";
-import { showToast } from "../../service/toast";
+import { showToast } from "../../services/toast";
 
 import calculatorImage from "../../assets/calculadora.jpg";
 
@@ -30,7 +30,10 @@ export default function Page() {
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 		if (!title.trim() || !category) {
-			showToast({ text: "Preencha todos os campos obrigatórios.", color: "red" });
+			showToast({
+				text: "Preencha todos os campos obrigatórios.",
+				color: "red",
+			});
 			return;
 		}
 
@@ -46,12 +49,15 @@ export default function Page() {
 						imageUrl = uploadRes.url;
 					}
 				} catch (uploadErr) {
-					console.warn("Upload no Cloudinary falhou, usando imagem local:", uploadErr);
+					console.warn(
+						"Upload no Cloudinary falhou, usando imagem local:",
+						uploadErr
+					);
 					// Se o Cloudinary não estiver configurado no servidor, usa imagem padrão
 				}
 			}
 
-			const numericPrice = donation ? null : (price ? parseFloat(price) : null);
+			const numericPrice = donation ? null : price ? parseFloat(price) : null;
 
 			await announceApi.create({
 				title: title.trim(),
