@@ -46,13 +46,11 @@ export default function Page() {
 							E-mail enviado!
 						</h2>
 						<p className="mt-1 text-sm text-muted-foreground">
-							Se o e-mail <strong>{email}</strong> estiver cadastrado, você
+							Confira seu e-mail <strong>{email}</strong> , você
 							receberá o link para criar uma nova senha.
 						</p>
-						<p className="mt-2 text-xs text-muted-foreground">
-							(Em ambiente local/desenvolvimento sem chave de e-mail, confira o
-							console do servidor).
-						</p>
+						{/* Em ambiente local/desenvolvimento sem chave de e-mail, confira o
+						console do servidor */}
 						<Link
 							to="/entrar"
 							className="mt-4 inline-block text-sm font-semibold text-primary"

@@ -1,7 +1,11 @@
 import { Link } from "./link";
-import { Gift, MapPin } from "lucide-react";
+import { Gift } from "lucide-react";
 import { formatPrice } from "../lib/demo-data";
+import { formatRelativeTime } from "../lib/formatters";
+
 export function ListingCard({ item }) {
+	const publishedAt = formatRelativeTime(item.created_at ?? item.createdAt);
+
 	return (
 		<article className="group overflow-hidden rounded-lg border border-border bg-card transition-colors hover:border-card-hover">
 			<Link to="/anuncio/$id" params={{ id: item.id }} className="block">
@@ -43,8 +47,11 @@ export function ListingCard({ item }) {
 								.join("")}
 						</span>
 						<span className="truncate">{item.seller}</span>
-						<MapPin className="ml-auto size-3.5" />
-						<span>Campus</span>
+						{publishedAt && (
+							<span className="ml-auto whitespace-nowrap">
+								Criado {publishedAt}
+							</span>
+						)}
 					</div>
 				</div>
 			</Link>

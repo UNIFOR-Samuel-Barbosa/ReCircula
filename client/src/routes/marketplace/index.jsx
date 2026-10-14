@@ -26,6 +26,7 @@ export default function Index() {
 						category: x.category,
 						price: x.price,
 						donation: x.donation,
+						created_at: x.created_at,
 						image: x.image_url,
 						seller: x.user?.name || "Estudante",
 						sellerId: x.user_id,

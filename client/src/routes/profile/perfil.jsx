@@ -7,6 +7,7 @@ import { Link } from "../../components/link";
 import { useAuth } from "../../context/AuthContext";
 import { announceApi } from "../../services/api";
 import { showToast } from "../../services/toast";
+import { formatTelephone, normalizeTelephone } from "../../lib/formatters";
 
 export default function Page() {
 	const nav = useNavigate();
@@ -30,7 +31,7 @@ export default function Page() {
 		if (user) {
 			setName(user.name || "");
 			setBiography(user.biography || "");
-			setTelephone(user.telephone || "");
+			setTelephone(formatTelephone(user.telephone));
 		}
 	}, [user]);
 
@@ -76,7 +77,7 @@ export default function Page() {
 			await updateUser({
 				name: name.trim(),
 				biography: biography.trim() || null,
-				telephone: telephone.trim() || null,
+				telephone: normalizeTelephone(telephone) || null,
 			});
 			setEditing(false);
 			showToast({ text: "Perfil atualizado com sucesso!", color: "green" });
@@ -121,7 +122,7 @@ export default function Page() {
 					<p className="mt-1 text-sm text-muted-foreground">{user.email}</p>
 					{user.telephone && (
 						<p className="mt-1 text-xs text-muted-foreground">
-							Contato: {user.telephone}
+							Contato: {formatTelephone(user.telephone)}
 						</p>
 					)}
 					<p className="mt-4 max-w-xl leading-6 text-muted-foreground">
@@ -166,8 +167,9 @@ export default function Page() {
 									price: item.price,
 									donation: item.donation,
 									image: item.image_url,
+									created_at: item.created_at,
 									seller: user.name,
-									course: user.telephone || "Estudante",
+									course: user.telephone ?? "",
 								}}
 							/>
 						))}
@@ -217,9 +219,11 @@ export default function Page() {
 							<Field label="Telefone / WhatsApp">
 								<Input
 									value={telephone}
-									onChange={(e) => setTelephone(e.target.value)}
-									maxLength={20}
-									placeholder="(85) 99999-9999"
+									onChange={(e) =>
+										setTelephone(formatTelephone(e.target.value))
+									}
+									maxLength={16}
+									placeholder="(85) 9 9999-9999"
 									disabled={saving}
 								/>
 							</Field>

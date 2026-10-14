@@ -5,6 +5,9 @@ import { listings } from "../../lib/demo-data";
 import { ListingCard } from "../../components/listing-card";
 import { Button } from "../../components/ui";
 import { profileApi, announceApi } from "../../services/api";
+import {
+	normalizeTelephone,
+} from "../../lib/formatters";
 
 export default function Page() {
 	const { id } = useParams();
@@ -61,7 +64,8 @@ export default function Page() {
 		.join("")
 		.toUpperCase();
 
-	const cleanPhone = (profile.telephone || "5585999991204").replace(/\D/g, "");
+	const phoneDigits = normalizeTelephone(profile.telephone);
+	const cleanPhone = phoneDigits ? `55${phoneDigits}` : "";
 
 	return (
 		<div className="mx-auto max-w-6xl px-4 py-10 lg:px-8">
@@ -120,6 +124,7 @@ export default function Page() {
 							price: x.price,
 							donation: x.donation,
 							image: x.image_url || x.image,
+							created_at: x.created_at,
 							seller: profile.name,
 							course: profile.telephone || "Estudante",
 						}}
