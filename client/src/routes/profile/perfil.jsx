@@ -1,4 +1,10 @@
-import { useState, useEffect, useLayoutEffect, useRef } from "react";
+import {
+	useState,
+	useEffect,
+	useLayoutEffect,
+	useRef,
+	useCallback,
+} from "react";
 import { Camera, Edit3, LogOut, Loader2, Plus, Sparkles } from "lucide-react";
 import { ListingCard } from "../../components/listing-card";
 import { Button, Field, Input, Textarea } from "../../components/ui";
@@ -31,6 +37,19 @@ export default function Page() {
 	const pendingTelephoneCaret = useRef(null);
 	const pendingCountryCodeCaret = useRef(null);
 
+	const resetFormFromProfile = useCallback((profile = user) => {
+		if (!profile) return;
+
+		setName(profile.name || "");
+		setBiography(profile.biography || "");
+		const storedDigits = String(profile.telephone || "").replace(/\D/g, "");
+		const countryCodeDigits = getCountryCodeFromTelephone(storedDigits);
+
+		setIncludeCountryCode(Boolean(countryCodeDigits));
+		setCountryCode(countryCodeDigits);
+		setTelephone(normalizeTelephone(storedDigits));
+	}, [user]);
+
 	useLayoutEffect(() => {
 		if (pendingTelephoneCaret.current === null) return;
 		telephoneInputRef.current?.setSelectionRange(
@@ -56,19 +75,8 @@ export default function Page() {
 	}, [isLoading, isLoggedIn, nav]);
 
 	useEffect(() => {
-		if (user) {
-			setName(user.name || "");
-			setBiography(user.biography || "");
-			const storedDigits = String(user.telephone || "").replace(/\D/g, "");
-			const countryCodeDigits = getCountryCodeFromTelephone(storedDigits);
-			const hasCountryCode = Boolean(countryCodeDigits);
-			const normalizedDigits = normalizeTelephone(storedDigits);
-
-			setIncludeCountryCode(hasCountryCode);
-			setCountryCode(hasCountryCode ? countryCodeDigits : "");
-			setTelephone(normalizedDigits);
-		}
-	}, [user]);
+		resetFormFromProfile(user);
+	}, [resetFormFromProfile, user]);
 
 	useEffect(() => {
 		if (isLoggedIn) {
@@ -198,11 +206,12 @@ export default function Page() {
 				.filter(Boolean)
 				.join("");
 
-			await updateUser({
+			const updatedProfile = await updateUser({
 				name: name.trim(),
 				biography: biography.trim() || null,
 				telephone: savedTelephone || null,
 			});
+			resetFormFromProfile(updatedProfile);
 			setEditing(false);
 			showToast({ text: "Perfil atualizado com sucesso!", color: "green" });
 		} catch (err) {
@@ -218,6 +227,11 @@ export default function Page() {
 	const handleSignOut = async () => {
 		await signOut();
 		nav({ to: "/entrar" });
+	};
+
+	const handleCancelEditing = () => {
+		resetFormFromProfile();
+		setEditing(false);
 	};
 
 	return (
@@ -254,7 +268,13 @@ export default function Page() {
 					</p>
 				</div>
 				<div className="flex gap-2">
-					<Button variant="secondary" onClick={() => setEditing(true)}>
+					<Button
+						variant="secondary"
+						onClick={() => {
+							resetFormFromProfile();
+							setEditing(true);
+						}}
+					>
 						<Edit3 className="size-4" />
 						Editar
 					</Button>
@@ -344,7 +364,7 @@ export default function Page() {
 								<label htmlFor="profile-telephone">Telefone / WhatsApp</label>
 								<div className="flex items-center gap-2">
 									{includeCountryCode && (
-										<div className="flex items-center gap-2 rounded-md border border-input bg-secondary px-2 py-1.5">
+										<div className="flex h-11 shrink-0 items-center gap-2 rounded-md border border-input bg-secondary px-2 py-0">
 											<span className="text-sm text-muted-foreground">+</span>
 											<Input
 												ref={countryCodeInputRef}
@@ -354,7 +374,7 @@ export default function Page() {
 												onChange={handleCountryCodeChange}
 												placeholder="55"
 												maxLength={3}
-												className="w-16 border-0 bg-transparent px-0 shadow-none focus-visible:ring-0"
+												className="h-full w-16 border-0 bg-transparent px-0 shadow-none focus-visible:ring-0"
 												disabled={saving}
 											/>
 										</div>
@@ -391,7 +411,7 @@ export default function Page() {
 							<Button
 								type="button"
 								variant="ghost"
-								onClick={() => setEditing(false)}
+								onClick={handleCancelEditing}
 								disabled={saving}
 							>
 								Cancelar
