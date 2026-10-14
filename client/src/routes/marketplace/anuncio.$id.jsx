@@ -11,9 +11,11 @@ import {
 } from "../../lib/formatters";
 import { Button } from "../../components/ui";
 import { announceApi } from "../../services/api";
+import { useAuth } from "../../context/AuthContext";
 
 export default function Page() {
 	const { id } = useParams();
+	const { user } = useAuth();
 	const [item, setItem] = useState(null);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState("");
@@ -70,7 +72,12 @@ export default function Page() {
 	const phoneDigits = normalizeTelephone(item.phone);
 	const countryCode = getCountryCodeFromTelephone(item.phone || "");
 	const cleanPhone = phoneDigits ? buildWhatsappNumber(phoneDigits, countryCode || "") : "";
-	const hasWhatsappNumber = Boolean(item.phone && item.phone.trim());
+	const isOwnListing =
+		user?.id != null &&
+		item.sellerId != null &&
+		String(user.id) === String(item.sellerId);
+	const hasWhatsappNumber =
+		!isOwnListing && Boolean(item.phone && item.phone.trim());
 	const initials = (item.seller || "Usuário")
 		.trim()
 		.split(/\s+/)
@@ -121,8 +128,8 @@ export default function Page() {
 					)}
 					<div className="mt-8 border-y border-border py-5">
 						<Link
-							to="/usuario/$id"
-							params={{ id: item.sellerId }}
+							to={isOwnListing ? "/perfil" : "/usuario/$id"}
+							params={isOwnListing ? undefined : { id: item.sellerId }}
 							className="flex items-center gap-3"
 						>
 							<span className="grid size-11 shrink-0 place-items-center overflow-hidden rounded-full bg-secondary font-bold">
@@ -145,25 +152,26 @@ export default function Page() {
 							<span className="ml-auto text-sm text-primary">Ver perfil</span>
 						</Link>
 					</div>
-					{hasWhatsappNumber ? (
-						<a
-							className="mt-6"
-							href={`https://wa.me/${cleanPhone}?text=${encodeURIComponent(
-								`Olá! Vi o seu anúncio “${item.title}” no ReCircula.`
-							)}`}
-							target="_blank"
-							rel="noreferrer"
-						>
-							<Button className="w-full cursor-pointer">
-								<MessageCircle className="size-5" />
-								Conversar no WhatsApp
-							</Button>
-						</a>
-					) : (
-						<p className="mt-6 text-center text-sm text-muted-foreground">
-							O vendedor não informou um telefone para contato.
-						</p>
-					)}
+					{!isOwnListing &&
+						(hasWhatsappNumber ? (
+							<a
+								className="mt-6"
+								href={`https://wa.me/${cleanPhone}?text=${encodeURIComponent(
+									`Olá! Vi o seu anúncio “${item.title}” no ReCircula.`
+								)}`}
+								target="_blank"
+								rel="noreferrer"
+							>
+								<Button className="w-full cursor-pointer">
+									<MessageCircle className="size-5" />
+									Conversar no WhatsApp
+								</Button>
+							</a>
+						) : (
+							<p className="mt-6 text-center text-sm text-muted-foreground">
+								O vendedor não informou um telefone para contato.
+							</p>
+						))}
 					<p className="mt-4 flex items-center justify-center gap-2 text-xs text-muted-foreground">
 						<ShieldCheck className="size-4" />
 						Combine o local de entrega diretamente com o vendedor.
