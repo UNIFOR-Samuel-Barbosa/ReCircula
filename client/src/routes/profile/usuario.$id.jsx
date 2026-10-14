@@ -6,6 +6,8 @@ import { ListingCard } from "../../components/listing-card";
 import { Button } from "../../components/ui";
 import { profileApi, announceApi } from "../../services/api";
 import {
+	buildWhatsappNumber,
+	getCountryCodeFromTelephone,
 	normalizeTelephone,
 } from "../../lib/formatters";
 
@@ -33,7 +35,6 @@ export default function Page() {
 							name: sample.seller,
 							biography:
 								"Materiais bem cuidados, negociação transparente e entrega dentro do campus.",
-							telephone: "5585999991204",
 						});
 						setUserItems(items);
 					}
@@ -65,7 +66,9 @@ export default function Page() {
 		.toUpperCase();
 
 	const phoneDigits = normalizeTelephone(profile.telephone);
-	const cleanPhone = phoneDigits ? `55${phoneDigits}` : "";
+	const countryCode = getCountryCodeFromTelephone(profile.telephone || "");
+	const cleanPhone = phoneDigits ? buildWhatsappNumber(phoneDigits, countryCode || "") : "";
+	const canShowWhatsapp = Boolean(profile.telephone && profile.telephone.trim());
 
 	return (
 		<div className="mx-auto max-w-6xl px-4 py-10 lg:px-8">
@@ -95,7 +98,7 @@ export default function Page() {
 						Fortaleza · Campus UNIFOR
 					</p>
 				</div>
-				{profile.telephone && (
+				{canShowWhatsapp && (
 					<a
 						href={`https://wa.me/${cleanPhone}?text=${encodeURIComponent(
 							`Olá, ${profile.name}! Encontrei seu perfil no ReCircula.`
@@ -103,7 +106,7 @@ export default function Page() {
 						target="_blank"
 						rel="noreferrer"
 					>
-						<Button>
+						<Button className="cursor-pointer">
 							<MessageCircle className="size-4" />
 							Conversar no WhatsApp
 						</Button>

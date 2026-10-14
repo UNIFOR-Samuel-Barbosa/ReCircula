@@ -32,30 +32,55 @@ export function formatRelativeTime(value) {
 	);
 }
 
-export function normalizeTelephone(value) {
-	let digits = String(value ?? "").replace(/\D/g, "");
-	if ((digits.length === 12 || digits.length === 13) && digits.startsWith("55")) {
-		digits = digits.slice(2);
-	}
-	return digits.slice(0, 11);
+export function getCountryCodeFromTelephone(value) {
+	const digits = String(value ?? "").replace(/\D/g, "");
+	if (digits.length <= 11) return "";
+	return digits.slice(0, digits.length - 11);
 }
 
-export function formatTelephone(value) {
+export function normalizeTelephone(value) {
+	const digits = String(value ?? "").replace(/\D/g, "");
+	if (digits.length <= 11) return digits.slice(0, 11);
+	return digits.slice(digits.length - 11);
+}
+
+export function buildWhatsappNumber(value, countryCode = "") {
+	const digits = String(value ?? "").replace(/\D/g, "");
+	if (!digits) return "";
+	const normalized = normalizeTelephone(digits);
+	const code = String(countryCode ?? "").replace(/\D/g, "");
+	if (code) return `${code}${normalized}`;
+	if (digits.length > 11) return digits;
+	return `55${normalized}`;
+}
+
+export function formatTelephone(value, options = {}) {
+	const { includeCountryCode = false, countryCode = "" } = options;
 	const digits = normalizeTelephone(value);
 	if (!digits) return "";
-	if (digits.length < 3) {
-		return digits.length === 2 ? `(${digits})` : `(${digits}`;
-	}
 
-	const areaCode = digits.slice(0, 2);
-	const subscriber = digits.slice(2);
-	if (digits.length === 10) {
-		return `(${areaCode}) ${subscriber.slice(0, 4)}-${subscriber.slice(4)}`;
-	}
+	const visualCountryCode = includeCountryCode
+		? String(countryCode || getCountryCodeFromTelephone(value) || "").replace(/\D/g, "")
+		: "";
 
-	return `(${areaCode}) ${subscriber[0]}${
-		subscriber.length > 1
-			? ` ${subscriber.slice(1, 5)}${subscriber.length > 5 ? `-${subscriber.slice(5)}` : ""}`
-			: ""
-	}`;
+	const formatted = (() => {
+		if (digits.length < 3) {
+			return `(${digits}`;
+		}
+
+		const areaCode = digits.slice(0, 2);
+		const subscriber = digits.slice(2);
+		if (digits.length === 10) {
+			return `(${areaCode}) ${subscriber.slice(0, 4)}-${subscriber.slice(4)}`;
+		}
+
+		return `(${areaCode}) ${subscriber[0]}${
+			subscriber.length > 1
+				? ` ${subscriber.slice(1, 5)}${subscriber.length > 5 ? `-${subscriber.slice(5)}` : ""}`
+				: ""
+		}`;
+	})();
+
+	if (!visualCountryCode) return formatted;
+	return `+${visualCountryCode} ${formatted}`;
 }

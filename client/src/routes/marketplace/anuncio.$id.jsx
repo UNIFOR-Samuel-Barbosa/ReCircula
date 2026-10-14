@@ -4,7 +4,9 @@ import { useParams } from "../../hooks/useNavigation";
 import { ArrowLeft, MessageCircle, ShieldCheck, Loader2 } from "lucide-react";
 import { formatPrice } from "../../lib/demo-data";
 import {
+	buildWhatsappNumber,
 	formatRelativeTime,
+	getCountryCodeFromTelephone,
 	normalizeTelephone,
 } from "../../lib/formatters";
 import { Button } from "../../components/ui";
@@ -66,7 +68,9 @@ export default function Page() {
 	}
 
 	const phoneDigits = normalizeTelephone(item.phone);
-	const cleanPhone = phoneDigits ? `55${phoneDigits}` : "";
+	const countryCode = getCountryCodeFromTelephone(item.phone || "");
+	const cleanPhone = phoneDigits ? buildWhatsappNumber(phoneDigits, countryCode || "") : "";
+	const hasWhatsappNumber = Boolean(item.phone && item.phone.trim());
 	const initials = (item.seller || "Usuário")
 		.trim()
 		.split(/\s+/)
@@ -141,7 +145,7 @@ export default function Page() {
 							<span className="ml-auto text-sm text-primary">Ver perfil</span>
 						</Link>
 					</div>
-					{cleanPhone ? (
+					{hasWhatsappNumber ? (
 						<a
 							className="mt-6"
 							href={`https://wa.me/${cleanPhone}?text=${encodeURIComponent(
@@ -150,7 +154,7 @@ export default function Page() {
 							target="_blank"
 							rel="noreferrer"
 						>
-							<Button className="w-full">
+							<Button className="w-full cursor-pointer">
 								<MessageCircle className="size-5" />
 								Conversar no WhatsApp
 							</Button>

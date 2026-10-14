@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useLayoutEffect, useRef } from "react";
 import { Camera, Edit3, LogOut, Loader2, Plus, Sparkles } from "lucide-react";
 import { ListingCard } from "../../components/listing-card";
 import { Button, Field, Input, Textarea } from "../../components/ui";
@@ -7,7 +7,11 @@ import { Link } from "../../components/link";
 import { useAuth } from "../../context/AuthContext";
 import { announceApi } from "../../services/api";
 import { showToast } from "../../services/toast";
-import { formatTelephone, normalizeTelephone } from "../../lib/formatters";
+import {
+	formatTelephone,
+	getCountryCodeFromTelephone,
+	normalizeTelephone,
+} from "../../lib/formatters";
 
 export default function Page() {
 	const nav = useNavigate();
@@ -20,6 +24,30 @@ export default function Page() {
 	const [name, setName] = useState("");
 	const [biography, setBiography] = useState("");
 	const [telephone, setTelephone] = useState("");
+	const [countryCode, setCountryCode] = useState("");
+	const [includeCountryCode, setIncludeCountryCode] = useState(false);
+	const telephoneInputRef = useRef(null);
+	const countryCodeInputRef = useRef(null);
+	const pendingTelephoneCaret = useRef(null);
+	const pendingCountryCodeCaret = useRef(null);
+
+	useLayoutEffect(() => {
+		if (pendingTelephoneCaret.current === null) return;
+		telephoneInputRef.current?.setSelectionRange(
+			pendingTelephoneCaret.current,
+			pendingTelephoneCaret.current
+		);
+		pendingTelephoneCaret.current = null;
+	}, [telephone]);
+
+	useLayoutEffect(() => {
+		if (pendingCountryCodeCaret.current === null) return;
+		countryCodeInputRef.current?.setSelectionRange(
+			pendingCountryCodeCaret.current,
+			pendingCountryCodeCaret.current
+		);
+		pendingCountryCodeCaret.current = null;
+	}, [countryCode]);
 
 	useEffect(() => {
 		if (!isLoading && !isLoggedIn) {
@@ -31,7 +59,14 @@ export default function Page() {
 		if (user) {
 			setName(user.name || "");
 			setBiography(user.biography || "");
-			setTelephone(formatTelephone(user.telephone));
+			const storedDigits = String(user.telephone || "").replace(/\D/g, "");
+			const countryCodeDigits = getCountryCodeFromTelephone(storedDigits);
+			const hasCountryCode = Boolean(countryCodeDigits);
+			const normalizedDigits = normalizeTelephone(storedDigits);
+
+			setIncludeCountryCode(hasCountryCode);
+			setCountryCode(hasCountryCode ? countryCodeDigits : "");
+			setTelephone(normalizedDigits);
 		}
 	}, [user]);
 
@@ -69,15 +104,104 @@ export default function Page() {
 				.toUpperCase()
 		: "U";
 
+	const caretAfterDigitCount = (value, digitCount) => {
+		if (digitCount === 0) return 0;
+		let digitsSeen = 0;
+		for (let index = 0; index < value.length; index += 1) {
+			if (/\d/.test(value[index])) digitsSeen += 1;
+			if (digitsSeen === digitCount) return index + 1;
+		}
+		return value.length;
+	};
+
+	const handleTelephoneChange = (event) => {
+		const inputValue = event.target.value;
+		const cursor = event.target.selectionStart ?? inputValue.length;
+		const digitsBeforeCursor = inputValue
+			.slice(0, cursor)
+			.replace(/\D/g, "").length;
+		const nextTelephone = normalizeTelephone(inputValue);
+		const nextDisplay = formatTelephone(nextTelephone);
+		const nextCursor = caretAfterDigitCount(
+			nextDisplay,
+			Math.min(nextTelephone.length, Math.max(0, digitsBeforeCursor))
+		);
+
+		pendingTelephoneCaret.current = nextCursor;
+		setTelephone(nextTelephone);
+	};
+
+	const handleCountryCodeChange = (event) => {
+		const rawValue = event.target.value.replace(/\D/g, "").slice(0, 3);
+		const nextCountryCode = rawValue;
+		const caret = event.target.selectionStart ?? rawValue.length;
+		pendingCountryCodeCaret.current = Math.min(caret, rawValue.length);
+		setCountryCode(nextCountryCode);
+	};
+
+	const handleTelephoneKeyDown = (event) => {
+		if (
+			(event.key !== "Backspace" && event.key !== "Delete") ||
+			event.currentTarget.selectionStart !==
+				event.currentTarget.selectionEnd
+		) {
+			return;
+		}
+
+		const display = formatTelephone(telephone);
+		const cursor = event.currentTarget.selectionStart;
+		const backward = event.key === "Backspace";
+		let punctuationIndex = backward ? cursor - 1 : cursor;
+		if (
+			punctuationIndex < 0 ||
+			punctuationIndex >= display.length ||
+			/\d/.test(display[punctuationIndex])
+		) {
+			return;
+		}
+
+		while (
+			punctuationIndex >= 0 &&
+			punctuationIndex < display.length &&
+			!/\d/.test(display[punctuationIndex])
+		) {
+			punctuationIndex += backward ? -1 : 1;
+		}
+		if (punctuationIndex < 0 || punctuationIndex >= display.length) return;
+
+		const digitIndex = display
+			.slice(0, punctuationIndex)
+			.replace(/\D/g, "").length;
+		const removedDigitIndex = backward ? digitIndex - 1 : digitIndex;
+		if (removedDigitIndex < 0 || removedDigitIndex >= telephone.length) return;
+
+		event.preventDefault();
+		const nextTelephone =
+			telephone.slice(0, removedDigitIndex) +
+			telephone.slice(removedDigitIndex + 1);
+		pendingTelephoneCaret.current = caretAfterDigitCount(
+			formatTelephone(nextTelephone),
+			removedDigitIndex
+		);
+		setTelephone(nextTelephone);
+	};
+
 	const handleSave = async (e) => {
 		e.preventDefault();
 		setSaving(true);
 
 		try {
+			const sanitizedCountryCode = includeCountryCode
+				? countryCode.replace(/\D/g, "").slice(0, 3)
+				: "";
+			const savedTelephone = [sanitizedCountryCode, normalizeTelephone(telephone)]
+				.filter(Boolean)
+				.join("");
+
 			await updateUser({
 				name: name.trim(),
 				biography: biography.trim() || null,
-				telephone: normalizeTelephone(telephone) || null,
+				telephone: savedTelephone || null,
 			});
 			setEditing(false);
 			showToast({ text: "Perfil atualizado com sucesso!", color: "green" });
@@ -216,17 +340,52 @@ export default function Page() {
 									disabled={saving}
 								/>
 							</Field>
-							<Field label="Telefone / WhatsApp">
-								<Input
-									value={telephone}
-									onChange={(e) =>
-										setTelephone(formatTelephone(e.target.value))
-									}
-									maxLength={16}
-									placeholder="(85) 9 9999-9999"
-									disabled={saving}
-								/>
-							</Field>
+							<div className="grid gap-2 text-sm font-medium text-foreground">
+								<label htmlFor="profile-telephone">Telefone / WhatsApp</label>
+								<div className="flex items-center gap-2">
+									{includeCountryCode && (
+										<div className="flex items-center gap-2 rounded-md border border-input bg-secondary px-2 py-1.5">
+											<span className="text-sm text-muted-foreground">+</span>
+											<Input
+												ref={countryCodeInputRef}
+												type="tel"
+												inputMode="numeric"
+												value={countryCode}
+												onChange={handleCountryCodeChange}
+												placeholder="55"
+												maxLength={3}
+												className="w-16 border-0 bg-transparent px-0 shadow-none focus-visible:ring-0"
+												disabled={saving}
+											/>
+										</div>
+									)}
+									<Input
+										id="profile-telephone"
+										ref={telephoneInputRef}
+										type="tel"
+										inputMode="numeric"
+										value={formatTelephone(telephone)}
+										onChange={handleTelephoneChange}
+										onKeyDown={handleTelephoneKeyDown}
+										maxLength={16}
+										placeholder="(99) 9 9999-9999"
+										disabled={saving}
+									/>
+								</div>
+								<label className="flex items-center gap-2 text-xs font-normal text-muted-foreground">
+									<input
+										type="checkbox"
+										checked={includeCountryCode}
+										onChange={(event) => {
+											const checked = event.target.checked;
+											setIncludeCountryCode(checked);
+											if (!checked) setCountryCode("");
+										}}
+										disabled={saving}
+									/>
+									Incluir código do país
+								</label>
+							</div>
 						</div>
 						<div className="mt-6 flex justify-end gap-2">
 							<Button
