@@ -2,6 +2,11 @@
 
 Índice dos documentos de planejamento e desenvolvimento do projeto.
 
+## Contexto para IA
+
+- [Índice principal e mapa do projeto](../AI_CONTEXT.md)
+- [Guias modulares em docs/ai](ai/README.md)
+
 ## Entregas
 
 - [Relatório da Etapa 1 — Plano de Trabalho](entregas/produzido/Relatorio_Etapa_1.md)
