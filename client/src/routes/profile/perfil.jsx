@@ -10,8 +10,9 @@ import { ListingCard } from "../../components/listing-card";
 import { Button, Field, Input, Textarea } from "../../components/ui";
 import { useNavigate } from "../../hooks/useNavigation";
 import { Link } from "../../components/link";
+import { ProfileAvatar } from "../../components/profile-avatar";
 import { useAuth } from "../../context/AuthContext";
-import { announceApi } from "../../services/api";
+import { announceApi, profileApi } from "../../services/api";
 import { showToast } from "../../services/toast";
 import {
 	formatTelephone,
@@ -32,8 +33,12 @@ export default function Page() {
 	const [telephone, setTelephone] = useState("");
 	const [countryCode, setCountryCode] = useState("");
 	const [includeCountryCode, setIncludeCountryCode] = useState(false);
+	const [photoFile, setPhotoFile] = useState(null);
+	const [photoPreview, setPhotoPreview] = useState(null);
+
 	const telephoneInputRef = useRef(null);
 	const countryCodeInputRef = useRef(null);
+	const fileInputRef = useRef(null);
 	const pendingTelephoneCaret = useRef(null);
 	const pendingCountryCodeCaret = useRef(null);
 
@@ -48,7 +53,24 @@ export default function Page() {
 		setIncludeCountryCode(Boolean(countryCodeDigits));
 		setCountryCode(countryCodeDigits);
 		setTelephone(normalizeTelephone(storedDigits));
+
+		setPhotoFile(null);
+		setPhotoPreview((prev) => {
+			if (prev) URL.revokeObjectURL(prev);
+			return null;
+		});
+		if (fileInputRef.current) {
+			fileInputRef.current.value = "";
+		}
 	}, [user]);
+
+	useEffect(() => {
+		return () => {
+			if (photoPreview) {
+				URL.revokeObjectURL(photoPreview);
+			}
+		};
+	}, [photoPreview]);
 
 	useLayoutEffect(() => {
 		if (pendingTelephoneCaret.current === null) return;
@@ -194,11 +216,53 @@ export default function Page() {
 		setTelephone(nextTelephone);
 	};
 
+	const handlePhotoChange = (e) => {
+		const file = e.target.files?.[0];
+		if (!file) return;
+
+		if (!["image/png", "image/jpeg", "image/webp"].includes(file.type)) {
+			showToast({
+				text: "Formato de imagem inválido. Escolha PNG, JPG ou WEBP.",
+				color: "red",
+			});
+			return;
+		}
+
+		if (file.size > 10 * 1024 * 1024) {
+			showToast({
+				text: "A imagem excede o limite de 10 MB.",
+				color: "red",
+			});
+			return;
+		}
+
+		setPhotoFile(file);
+		setPhotoPreview((prev) => {
+			if (prev) URL.revokeObjectURL(prev);
+			return URL.createObjectURL(file);
+		});
+	};
+
 	const handleSave = async (e) => {
 		e.preventDefault();
 		setSaving(true);
 
 		try {
+			let photoUrlToSave = user.photo_url;
+
+			if (photoFile) {
+				const uploadRes = await profileApi.uploadPhoto(photoFile);
+				if (
+					typeof uploadRes?.url !== "string" ||
+					!uploadRes.url.startsWith("https://")
+				) {
+					throw new Error(
+						"O Cloudinary não retornou uma URL válida para a imagem."
+					);
+				}
+				photoUrlToSave = uploadRes.url;
+			}
+
 			const sanitizedCountryCode = includeCountryCode
 				? countryCode.replace(/\D/g, "").slice(0, 3)
 				: "";
@@ -208,6 +272,7 @@ export default function Page() {
 
 			const updatedProfile = await updateUser({
 				name: name.trim(),
+				photo_url: photoUrlToSave,
 				biography: biography.trim() || null,
 				telephone: savedTelephone || null,
 			});
@@ -237,17 +302,14 @@ export default function Page() {
 	return (
 		<div className="mx-auto max-w-6xl px-4 py-10 lg:px-8">
 			<div className="flex flex-col gap-6 border-b border-border pb-8 sm:flex-row sm:items-center">
-				<div className="relative grid size-24 shrink-0 place-items-center overflow-hidden rounded-full bg-secondary font-display text-2xl font-bold">
-					{user.photo_url ? (
-						<img
-							src={user.photo_url}
-							alt={user.name}
-							className="size-full object-cover"
-						/>
-					) : (
-						initials
-					)}
-				</div>
+				<ProfileAvatar
+					src={editing && photoPreview ? photoPreview : user.photo_url}
+					alt={user.name}
+					initials={initials}
+					size="size-24"
+					isEditing={editing}
+					onEditClick={() => fileInputRef.current?.click()}
+				/>
 				<div className="min-w-0 flex-1">
 					<div className="flex items-center gap-2">
 						<h1 className="font-display text-3xl font-bold">{user.name}</h1>
@@ -341,6 +403,66 @@ export default function Page() {
 						onSubmit={handleSave}
 					>
 						<h2 className="font-display text-2xl font-bold">Editar perfil</h2>
+
+						<div className="mt-5 flex flex-col items-center gap-4 rounded-lg border border-border/60 bg-secondary/30 p-4 sm:flex-row sm:items-center">
+							<ProfileAvatar
+								src={photoPreview || user.photo_url}
+								alt={name || user.name}
+								initials={initials}
+								size="size-20 sm:size-24"
+								isEditing={true}
+								onEditClick={() => fileInputRef.current?.click()}
+							/>
+							<div className="flex-1 text-center sm:text-left">
+								<p className="text-sm font-semibold text-foreground">
+									Foto de perfil
+								</p>
+								<p className="mt-0.5 text-xs text-muted-foreground">
+									PNG, JPG ou WEBP de até 10 MB.
+								</p>
+								<div className="mt-2.5 flex flex-wrap items-center justify-center gap-2 sm:justify-start">
+									<Button
+										type="button"
+										variant="secondary"
+										size="sm"
+										onClick={() => fileInputRef.current?.click()}
+										disabled={saving}
+									>
+										<Camera className="size-3.5" />
+										{photoPreview || user.photo_url ? "Alterar foto" : "Adicionar foto"}
+									</Button>
+									{photoFile && (
+										<Button
+											type="button"
+											variant="ghost"
+											size="sm"
+											className="text-xs text-muted-foreground hover:text-destructive"
+											onClick={() => {
+												setPhotoFile(null);
+												setPhotoPreview((prev) => {
+													if (prev) URL.revokeObjectURL(prev);
+													return null;
+												});
+												if (fileInputRef.current) fileInputRef.current.value = "";
+											}}
+											disabled={saving}
+										>
+											Desfazer nova foto
+										</Button>
+									)}
+								</div>
+							</div>
+						</div>
+
+						<input
+							ref={fileInputRef}
+							type="file"
+							accept="image/png,image/jpeg,image/webp"
+							className="hidden"
+							onChange={handlePhotoChange}
+							disabled={saving}
+						/>
+
 						<div className="mt-6 grid gap-5">
 							<Field label="Nome">
 								<Input
@@ -392,9 +514,10 @@ export default function Page() {
 										disabled={saving}
 									/>
 								</div>
-								<label className="flex items-center gap-2 text-xs font-normal text-muted-foreground">
+								<label className="flex items-center gap-2 text-xs font-normal text-muted-foreground cursor-pointer select-none">
 									<input
 										type="checkbox"
+										className="cursor-pointer"
 										checked={includeCountryCode}
 										onChange={(event) => {
 											const checked = event.target.checked;

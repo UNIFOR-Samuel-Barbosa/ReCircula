@@ -4,6 +4,7 @@ import { MessageCircle, MapPin, Loader2 } from "lucide-react";
 import { listings } from "../../lib/demo-data";
 import { ListingCard } from "../../components/listing-card";
 import { Button } from "../../components/ui";
+import { ProfileAvatar } from "../../components/profile-avatar";
 import { profileApi, announceApi } from "../../services/api";
 import {
 	buildWhatsappNumber,
@@ -73,17 +74,13 @@ export default function Page() {
 	return (
 		<div className="mx-auto max-w-6xl px-4 py-10 lg:px-8">
 			<div className="flex flex-col items-start gap-6 border-b border-border pb-8 sm:flex-row sm:items-center">
-				<div className="grid size-24 shrink-0 place-items-center overflow-hidden rounded-full bg-secondary font-display text-2xl font-bold">
-					{profile.photo_url ? (
-						<img
-							src={profile.photo_url}
-							alt={profile.name}
-							className="size-full object-cover"
-						/>
-					) : (
-						initials
-					)}
-				</div>
+				<ProfileAvatar
+					src={profile.photo_url}
+					alt={profile.name}
+					initials={initials}
+					size="size-24"
+					isEditing={false}
+				/>
 				<div className="flex-1">
 					<h1 className="font-display text-3xl font-bold">{profile.name}</h1>
 					<p className="mt-1 text-sm text-muted-foreground">
