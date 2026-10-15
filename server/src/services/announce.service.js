@@ -57,14 +57,29 @@ export async function create(userId, data) {
 	});
 }
 
-export async function update(announceId, userId, data) {
-	await getOwnedAnnounce(announceId, userId);
+export async function update(announceId, userId, data, userRole) {
+	await getOwnedAnnounce(announceId, userId, userRole);
 
-	if (data.price !== undefined && data.price !== null && data.price < 0) {
+	const updateData = { ...data };
+
+	if (updateData.donation === true) {
+		updateData.price = null;
+	} else if (updateData.donation === false) {
+		if (
+			updateData.price !== undefined &&
+			(updateData.price === null || updateData.price < 0)
+		) {
+			throw new AppError("Preço inválido.");
+		}
+	} else if (
+		updateData.price !== undefined &&
+		updateData.price !== null &&
+		updateData.price < 0
+	) {
 		throw new AppError("Preço inválido.");
 	}
 
-	return announceRepository.update(announceId, data);
+	return announceRepository.update(announceId, updateData);
 }
 
 export async function remove(announceId, userId, userRole) {

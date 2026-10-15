@@ -54,7 +54,8 @@ export async function update(req, res) {
 	const announce = await announceService.update(
 		req.params.id,
 		req.user.id,
-		req.body
+		req.body,
+		req.user.role
 	);
 
 	res.json(announce);
