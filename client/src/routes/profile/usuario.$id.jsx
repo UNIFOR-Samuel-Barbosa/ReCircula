@@ -4,7 +4,13 @@ import { MessageCircle, MapPin, Loader2 } from "lucide-react";
 import { listings } from "../../lib/demo-data";
 import { ListingCard } from "../../components/listing-card";
 import { Button } from "../../components/ui";
+import { ProfileAvatar } from "../../components/profile-avatar";
 import { profileApi, announceApi } from "../../services/api";
+import {
+	buildWhatsappNumber,
+	getCountryCodeFromTelephone,
+	normalizeTelephone,
+} from "../../lib/formatters";
 
 export default function Page() {
 	const { id } = useParams();
@@ -28,9 +34,9 @@ export default function Page() {
 						setProfile({
 							id: sample.sellerId,
 							name: sample.seller,
+							photo_url: sample.sellerPhoto || sample.photo_url || null,
 							biography:
 								"Materiais bem cuidados, negociação transparente e entrega dentro do campus.",
-							telephone: "5585999991204",
 						});
 						setUserItems(items);
 					}
@@ -61,22 +67,21 @@ export default function Page() {
 		.join("")
 		.toUpperCase();
 
-	const cleanPhone = (profile.telephone || "5585999991204").replace(/\D/g, "");
+	const phoneDigits = normalizeTelephone(profile.telephone);
+	const countryCode = getCountryCodeFromTelephone(profile.telephone || "");
+	const cleanPhone = phoneDigits ? buildWhatsappNumber(phoneDigits, countryCode || "") : "";
+	const canShowWhatsapp = Boolean(profile.telephone && profile.telephone.trim());
 
 	return (
 		<div className="mx-auto max-w-6xl px-4 py-10 lg:px-8">
 			<div className="flex flex-col items-start gap-6 border-b border-border pb-8 sm:flex-row sm:items-center">
-				<div className="grid size-24 shrink-0 place-items-center overflow-hidden rounded-full bg-secondary font-display text-2xl font-bold">
-					{profile.photo_url ? (
-						<img
-							src={profile.photo_url}
-							alt={profile.name}
-							className="size-full object-cover"
-						/>
-					) : (
-						initials
-					)}
-				</div>
+				<ProfileAvatar
+					src={profile.photo_url}
+					alt={profile.name}
+					initials={initials}
+					size="size-24"
+					isEditing={false}
+				/>
 				<div className="flex-1">
 					<h1 className="font-display text-3xl font-bold">{profile.name}</h1>
 					<p className="mt-1 text-sm text-muted-foreground">
@@ -91,7 +96,7 @@ export default function Page() {
 						Fortaleza · Campus UNIFOR
 					</p>
 				</div>
-				{profile.telephone && (
+				{canShowWhatsapp && (
 					<a
 						href={`https://wa.me/${cleanPhone}?text=${encodeURIComponent(
 							`Olá, ${profile.name}! Encontrei seu perfil no ReCircula.`
@@ -99,7 +104,7 @@ export default function Page() {
 						target="_blank"
 						rel="noreferrer"
 					>
-						<Button>
+						<Button className="cursor-pointer">
 							<MessageCircle className="size-4" />
 							Conversar no WhatsApp
 						</Button>
@@ -120,7 +125,9 @@ export default function Page() {
 							price: x.price,
 							donation: x.donation,
 							image: x.image_url || x.image,
+							created_at: x.created_at,
 							seller: profile.name,
+							sellerPhoto: profile.photo_url,
 							course: profile.telephone || "Estudante",
 						}}
 					/>

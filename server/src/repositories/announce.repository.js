@@ -55,7 +55,16 @@ export async function findAll(filters) {
 export async function findById(id) {
 	const { data, error } = await supabase
 		.from("announces")
-		.select("*")
+		.select(`
+			*,
+			user:profiles(
+				id,
+				name,
+				photo_url,
+				telephone,
+				role
+			)
+		`)
 		.eq("id", id)
 		.maybeSingle();
 
@@ -131,4 +140,3 @@ export async function remove(id) {
 
 	if (error) throw error;
 }
-

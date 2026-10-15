@@ -1,5 +1,5 @@
 import { Link } from "../../components/link";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { ShieldAlert, Trash2, Loader2 } from "lucide-react";
 import { formatPrice } from "../../lib/demo-data";
 import { Button } from "../../components/ui";
@@ -8,7 +8,7 @@ import { profileApi, announceApi } from "../../services/api";
 import { showToast } from "../../services/toast";
 
 export default function Page() {
-	const { isAdmin, isLoggedIn, isLoading } = useAuth();
+	const { isAdmin, isLoggedIn, isLoading, user } = useAuth();
 	const [users, setUsers] = useState([]);
 	const [listings, setListings] = useState([]);
 	const [loadingData, setLoadingData] = useState(true);
@@ -16,27 +16,28 @@ export default function Page() {
 	const [target, setTarget] = useState();
 	const [actionLoading, setActionLoading] = useState(false);
 
-	const loadData = async () => {
+	const loadData = useCallback(async () => {
 		setLoadingData(true);
 		try {
 			const [fetchedUsers, fetchedListings] = await Promise.all([
 				profileApi.getAll().catch(() => []),
 				announceApi.getAll().catch(() => []),
 			]);
-			setUsers(fetchedUsers || []);
+			const loggedUserId = user?.id;
+			setUsers((fetchedUsers || []).filter((u) => u.id !== loggedUserId));
 			setListings(fetchedListings || []);
 		} catch (err) {
 			console.warn("Erro ao carregar dados do dashboard:", err);
 		} finally {
 			setLoadingData(false);
 		}
-	};
+	}, [user?.id]);
 
 	useEffect(() => {
 		if (isAdmin) {
 			loadData();
 		}
-	}, [isAdmin]);
+	}, [isAdmin, loadData]);
 
 	if (isLoading) {
 		return (
@@ -96,7 +97,7 @@ export default function Page() {
 	};
 
 	const tabClass = (t) =>
-		`rounded-md px-4 py-2 text-sm font-medium transition-colors ${
+		`rounded-md px-4 py-2 text-sm font-medium transition-colors cursor-pointer ${
 			tab === t
 				? "bg-accent text-foreground"
 				: "text-muted-foreground hover:text-foreground"
@@ -162,8 +163,16 @@ export default function Page() {
 									key={u.id}
 									className="flex items-center gap-4 rounded-lg border border-border bg-card p-4 shadow-sm"
 								>
-									<div className="grid size-11 shrink-0 place-items-center rounded-full bg-secondary text-sm font-bold">
-										{initials}
+									<div className="grid size-11 shrink-0 place-items-center overflow-hidden rounded-full bg-secondary text-sm font-bold">
+										{u.photo_url ? (
+											<img
+												src={u.photo_url}
+												alt={u.name || "Foto do usuário"}
+												className="size-full object-cover"
+											/>
+										) : (
+											initials
+										)}
 									</div>
 									<div className="min-w-0 flex-1">
 										<div className="flex items-center gap-2">
@@ -178,16 +187,26 @@ export default function Page() {
 											{u.email} · {count} anúncio{count === 1 ? "" : "s"}
 										</p>
 									</div>
-									<Button
-										variant="ghost"
-										size="icon"
-										aria-label={`Excluir usuário ${u.name}`}
-										onClick={() =>
-											setTarget({ kind: "user", id: u.id, label: u.name })
-										}
-									>
-										<Trash2 className="size-4 text-destructive" />
-									</Button>
+									<div className="flex items-center gap-2">
+										<Link
+											to="/usuario/$id"
+											params={{ id: u.id }}
+										>
+											<Button size="sm" variant="secondary">
+												Ver Perfil
+											</Button>
+										</Link>
+										<Button
+											variant="ghost"
+											size="icon"
+											aria-label={`Excluir usuário ${u.name}`}
+											onClick={() =>
+												setTarget({ kind: "user", id: u.id, label: u.name })
+											}
+										>
+											<Trash2 className="size-4 text-destructive" />
+										</Button>
+									</div>
 								</div>
 							);
 						})}

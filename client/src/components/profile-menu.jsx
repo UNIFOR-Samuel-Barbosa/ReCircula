@@ -53,7 +53,7 @@ export function ProfileMenu() {
 				aria-expanded={open}
 				aria-haspopup="menu"
 				onClick={() => setOpen(!open)}
-				className="grid size-9 place-items-center overflow-hidden rounded-full border border-border bg-secondary text-xs font-bold transition-colors hover:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+				className="grid size-9 place-items-center overflow-hidden rounded-full border border-border bg-secondary text-xs font-bold transition-colors hover:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring cursor-pointer"
 			>
 				{user?.photo_url ? (
 					<img
@@ -71,11 +71,15 @@ export function ProfileMenu() {
 					className="absolute right-0 top-12 z-50 w-56 rounded-lg border border-border bg-popover p-1.5 shadow-2xl"
 				>
 					<div className="absolute -top-1.5 right-3 size-3 rotate-45 border-l border-t border-border bg-popover" />
-					
+
 					{user && (
 						<div className="border-b border-border px-3 py-2">
-							<p className="truncate text-sm font-semibold">{user.name}</p>
-							<p className="truncate text-xs text-muted-foreground">{user.email}</p>
+							<p className="truncate text-sm font-semibold cursor-default">
+								{user.name}
+							</p>
+							<p className="truncate text-xs text-muted-foreground cursor-default">
+								{user.email}
+							</p>
 							{isAdmin && (
 								<span className="mt-1 inline-block rounded bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold text-primary">
 									Administrador
@@ -108,7 +112,7 @@ export function ProfileMenu() {
 					<button
 						role="menuitem"
 						type="button"
-						className={`${itemClass} text-destructive`}
+						className={`${itemClass} text-destructive cursor-pointer`}
 						onClick={handleSignOut}
 					>
 						<LogOut className="size-4" />

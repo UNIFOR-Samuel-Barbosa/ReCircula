@@ -6,7 +6,8 @@ import { useAuth } from "../../context/AuthContext";
 import { announceApi } from "../../services/api";
 import { showToast } from "../../services/toast";
 
-import calculatorImage from "../../assets/calculadora.jpg";
+const ALLOWED_IMAGE_TYPES = ["image/png", "image/jpeg", "image/webp"];
+const MAX_IMAGE_SIZE = 10 * 1024 * 1024;
 
 export default function Page() {
 	const nav = useNavigate();
@@ -27,9 +28,14 @@ export default function Page() {
 		}
 	}, [isLoading, isLoggedIn, nav]);
 
+	useEffect(() => {
+		if (!preview) return;
+		return () => URL.revokeObjectURL(preview);
+	}, [preview]);
+
 	const handleSubmit = async (e) => {
 		e.preventDefault();
-		if (!title.trim() || !category) {
+		if (!title.trim() || !category || !imageFile) {
 			showToast({
 				text: "Preencha todos os campos obrigatórios.",
 				color: "red",
@@ -40,21 +46,14 @@ export default function Page() {
 		setSubmitting(true);
 
 		try {
-			let imageUrl = calculatorImage;
-
-			if (imageFile) {
-				try {
-					const uploadRes = await announceApi.uploadImage(imageFile);
-					if (uploadRes?.url) {
-						imageUrl = uploadRes.url;
-					}
-				} catch (uploadErr) {
-					console.warn(
-						"Upload no Cloudinary falhou, usando imagem local:",
-						uploadErr
-					);
-					// Se o Cloudinary não estiver configurado no servidor, usa imagem padrão
-				}
+			const uploadRes = await announceApi.uploadImage(imageFile);
+			if (
+				typeof uploadRes?.url !== "string" ||
+				!uploadRes.url.startsWith("https://")
+			) {
+				throw new Error(
+					"O Cloudinary não retornou uma URL pública segura para a imagem."
+				);
 			}
 
 			const numericPrice = donation ? null : price ? parseFloat(price) : null;
@@ -65,7 +64,7 @@ export default function Page() {
 				price: numericPrice,
 				donation,
 				description: description.trim() || null,
-				image_url: imageUrl,
+				image_url: uploadRes.url,
 			});
 
 			showToast({ text: "Anúncio publicado com sucesso!", color: "green" });
@@ -98,7 +97,8 @@ export default function Page() {
 				Capriche nas informações para encontrar a pessoa certa.
 			</p>
 			<form className="mt-8 grid gap-6" onSubmit={handleSubmit}>
-				<Field label="Foto do item">
+				<div className="grid gap-2 text-sm font-medium text-foreground">
+					<span>Foto do item</span>
 					<label className="grid min-h-52 cursor-pointer place-items-center overflow-hidden rounded-lg border border-dashed border-input bg-card text-center hover:border-primary transition-colors">
 						{preview ? (
 							<img
@@ -117,19 +117,45 @@ export default function Page() {
 						)}
 						<input
 							type="file"
-							accept="image/*"
+							accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp"
 							className="sr-only"
 							onChange={(e) => {
 								const file = e.target.files?.[0];
-								if (file) {
-									setImageFile(file);
-									setPreview(URL.createObjectURL(file));
+								if (!file) return;
+
+								if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+									setImageFile(null);
+									setPreview(undefined);
+									e.target.value = "";
+									showToast({
+										text: "Formato inválido. Envie uma imagem PNG, JPG ou WEBP.",
+										color: "red",
+									});
+									return;
 								}
+
+								if (file.size > MAX_IMAGE_SIZE) {
+									setImageFile(null);
+									setPreview(undefined);
+									e.target.value = "";
+									showToast({
+										text: "A imagem excede o limite de 10 MB.",
+										color: "red",
+									});
+									return;
+								}
+
+								setImageFile(file);
+								setPreview(URL.createObjectURL(file));
 							}}
+							required
 							disabled={submitting}
 						/>
 					</label>
-				</Field>
+					<small className="text-muted-foreground">
+						Obrigatória. Formatos aceitos: PNG, JPG ou WEBP (máximo de 10 MB).
+					</small>
+				</div>
 				<Field label="Título">
 					<Input
 						required
@@ -158,6 +184,7 @@ export default function Page() {
 								"Engenharia",
 								"Computação",
 								"Móveis",
+								"Outros",
 							].map((x) => (
 								<option key={x} value={x}>
 									{x}

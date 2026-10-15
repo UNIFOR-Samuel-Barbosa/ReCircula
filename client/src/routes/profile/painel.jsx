@@ -1,12 +1,351 @@
 import { Link } from "../../components/link";
 import { useEffect, useMemo, useState, useCallback } from "react";
-import { Plus, Search, Trash2, Loader2, Sparkles } from "lucide-react";
+import {
+	Plus,
+	Search,
+	Trash2,
+	Loader2,
+	Sparkles,
+	Pencil,
+	ImagePlus,
+	Gift,
+	X,
+} from "lucide-react";
 import { formatPrice } from "../../lib/demo-data";
-import { Button, Input } from "../../components/ui";
+import { Button, Input, Field, Select, Textarea } from "../../components/ui";
 import { useAuth } from "../../context/AuthContext";
 import { announceApi } from "../../services/api";
 import { useNavigate } from "../../hooks/useNavigation";
 import { showToast } from "../../services/toast";
+
+const ALLOWED_IMAGE_TYPES = ["image/png", "image/jpeg", "image/webp"];
+const MAX_IMAGE_SIZE = 10 * 1024 * 1024;
+const CATEGORIES = [
+	"Livros",
+	"Eletrônicos",
+	"Acessórios",
+	"Jalecos",
+	"Engenharia",
+	"Computação",
+	"Móveis",
+	"Outros",
+];
+
+function EditAnnounceModal({ item, onClose, onSave }) {
+	const [title, setTitle] = useState(item.title || "");
+	const [category, setCategory] = useState(item.category || "");
+	const [donation, setDonation] = useState(Boolean(item.donation));
+	const [price, setPrice] = useState(
+		item.donation ? "" : item.price != null ? String(item.price) : ""
+	);
+	const [description, setDescription] = useState(item.description || "");
+	const [imageFile, setImageFile] = useState(null);
+	const [preview, setPreview] = useState(item.image_url || item.image || "");
+	const [submitting, setSubmitting] = useState(false);
+
+	useEffect(() => {
+		const handleKeyDown = (e) => {
+			if (e.key === "Escape" && !submitting) {
+				onClose();
+			}
+		};
+		window.addEventListener("keydown", handleKeyDown);
+		return () => window.removeEventListener("keydown", handleKeyDown);
+	}, [onClose, submitting]);
+
+	useEffect(() => {
+		return () => {
+			if (imageFile && preview && preview.startsWith("blob:")) {
+				URL.revokeObjectURL(preview);
+			}
+		};
+	}, [imageFile, preview]);
+
+	const handleImageChange = (e) => {
+		const file = e.target.files?.[0];
+		if (!file) return;
+
+		if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+			e.target.value = "";
+			showToast({
+				text: "Formato inválido. Envie uma imagem PNG, JPG ou WEBP.",
+				color: "red",
+			});
+			return;
+		}
+
+		if (file.size > MAX_IMAGE_SIZE) {
+			e.target.value = "";
+			showToast({
+				text: "A imagem excede o limite de 10 MB.",
+				color: "red",
+			});
+			return;
+		}
+
+		setImageFile(file);
+		setPreview(URL.createObjectURL(file));
+	};
+
+	const handleRevertImage = () => {
+		setImageFile(null);
+		setPreview(item.image_url || item.image || "");
+	};
+
+	const handleSubmit = async (e) => {
+		e.preventDefault();
+		if (!title.trim()) {
+			showToast({ text: "O título é obrigatório.", color: "red" });
+			return;
+		}
+		if (!category) {
+			showToast({ text: "Selecione uma categoria.", color: "red" });
+			return;
+		}
+		if (!donation) {
+			if (price === "" || isNaN(Number(price)) || Number(price) < 0) {
+				showToast({
+					text: "Informe um preço válido (não negativo).",
+					color: "red",
+				});
+				return;
+			}
+		}
+
+		setSubmitting(true);
+		try {
+			let finalImageUrl = item.image_url || item.image;
+
+			if (imageFile) {
+				const uploadRes = await announceApi.uploadImage(imageFile);
+				if (
+					typeof uploadRes?.url !== "string" ||
+					!uploadRes.url.startsWith("https://")
+				) {
+					throw new Error(
+						"O Cloudinary não retornou uma URL pública válida para a imagem."
+					);
+				}
+				finalImageUrl = uploadRes.url;
+			}
+
+			const numericPrice = donation
+				? null
+				: price !== ""
+				? parseFloat(price)
+				: null;
+
+			const payload = {
+				title: title.trim(),
+				category,
+				price: numericPrice,
+				donation,
+				description: description.trim() || null,
+			};
+
+			if (finalImageUrl) {
+				payload.image_url = finalImageUrl;
+			}
+
+			const updated = await announceApi.update(item.id, payload);
+
+			onSave({
+				...item,
+				...payload,
+				...(updated || {}),
+			});
+			showToast({ text: "Anúncio atualizado com sucesso!", color: "green" });
+			onClose();
+		} catch (err) {
+			showToast({
+				text: err.message || "Erro ao atualizar anúncio.",
+				color: "red",
+			});
+		} finally {
+			setSubmitting(false);
+		}
+	};
+
+	return (
+		<div
+			className="fixed inset-0 z-60 grid place-items-center overflow-y-auto bg-overlay px-4 py-8"
+			role="dialog"
+			aria-modal="true"
+			aria-labelledby="edit-dialog-title"
+		>
+			<div className="w-full max-w-xl rounded-lg border border-border bg-popover p-6 shadow-2xl animate-in fade-in duration-150">
+				<div className="flex items-center justify-between border-b border-border pb-4">
+					<div>
+						<h2
+							id="edit-dialog-title"
+							className="font-display text-2xl font-bold"
+						>
+							Editar anúncio
+						</h2>
+						<p className="mt-1 text-sm text-muted-foreground">
+							Atualize as informações do seu anúncio acadêmico.
+						</p>
+					</div>
+					<Button
+						variant="ghost"
+						size="icon"
+						aria-label="Fechar"
+						onClick={onClose}
+						disabled={submitting}
+					>
+						<X className="size-5" />
+					</Button>
+				</div>
+
+				<form className="mt-6 grid gap-5" onSubmit={handleSubmit}>
+					{/* Foto do item */}
+					<div className="grid gap-2 text-sm font-medium text-foreground">
+						<span>Foto do anúncio</span>
+						<div className="flex flex-col sm:flex-row items-center gap-4 rounded-lg border border-border/80 bg-secondary/30 p-3">
+							<div className="relative h-24 w-28 shrink-0 overflow-hidden rounded-md border border-border bg-card">
+								{preview ? (
+									<img
+										src={preview}
+										alt="Prévia"
+										className="h-full w-full object-cover"
+									/>
+								) : (
+									<div className="grid h-full w-full place-items-center text-muted-foreground">
+										<ImagePlus className="size-6 text-primary" />
+									</div>
+								)}
+							</div>
+							<div className="flex-1 space-y-2 text-center sm:text-left">
+								<p className="text-xs text-muted-foreground">
+									Formatos aceitos: PNG, JPG ou WEBP (máximo de 10 MB).
+								</p>
+								<div className="flex flex-wrap items-center justify-center gap-2 sm:justify-start">
+									<label className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-md border border-border bg-card px-3 py-1.5 text-xs font-semibold hover:bg-accent transition-colors">
+										<ImagePlus className="size-3.5 text-primary" />
+										<span>{imageFile ? "Trocar foto" : "Alterar foto"}</span>
+										<input
+											type="file"
+											accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp"
+											className="sr-only"
+											onChange={handleImageChange}
+											disabled={submitting}
+										/>
+									</label>
+									{imageFile && (
+										<Button
+											type="button"
+											variant="ghost"
+											size="sm"
+											className="h-7 text-xs"
+											onClick={handleRevertImage}
+											disabled={submitting}
+										>
+											Reverter foto
+										</Button>
+									)}
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<Field label="Título">
+						<Input
+							required
+							placeholder="Ex.: Calculadora científica em ótimo estado"
+							value={title}
+							onChange={(e) => setTitle(e.target.value)}
+							disabled={submitting}
+						/>
+					</Field>
+
+					<div className="grid gap-4 sm:grid-cols-2">
+						<Field label="Categoria">
+							<Select
+								required
+								value={category}
+								onChange={(e) => setCategory(e.target.value)}
+								disabled={submitting}
+							>
+								<option value="" disabled>
+									Selecione uma categoria
+								</option>
+								{CATEGORIES.map((c) => (
+									<option key={c} value={c}>
+										{c}
+									</option>
+								))}
+							</Select>
+						</Field>
+
+						<Field label="Preço">
+							<Input
+								type="number"
+								min="0"
+								step="0.01"
+								disabled={donation || submitting}
+								placeholder={donation ? "Item para doação" : "R$ 0,00"}
+								value={donation ? "" : price}
+								onChange={(e) => setPrice(e.target.value)}
+								required={!donation}
+							/>
+						</Field>
+					</div>
+
+					<label className="flex cursor-pointer items-start gap-3 rounded-lg border border-border bg-card p-3.5 transition-colors hover:bg-accent/40">
+						<input
+							type="checkbox"
+							className="mt-1 size-4 accent-primary"
+							checked={donation}
+							onChange={(e) => setDonation(e.target.checked)}
+							disabled={submitting}
+						/>
+						<Gift className="size-5 shrink-0 text-primary" />
+						<span>
+							<strong className="block text-sm">Quero doar este item</strong>
+							<small className="text-xs text-muted-foreground">
+								O campo de preço será desativado e exibido como "Doação".
+							</small>
+						</span>
+					</label>
+
+					<Field
+						label="Descrição"
+						hint="Descreva o estado de conservação, detalhes e entrega."
+					>
+						<Textarea
+							maxLength={500}
+							placeholder="Descreva os detalhes importantes..."
+							value={description}
+							onChange={(e) => setDescription(e.target.value)}
+							disabled={submitting}
+						/>
+					</Field>
+
+					<div className="mt-2 flex justify-end gap-2 border-t border-border pt-4">
+						<Button
+							type="button"
+							variant="ghost"
+							onClick={onClose}
+							disabled={submitting}
+						>
+							Cancelar
+						</Button>
+						<Button type="submit" disabled={submitting}>
+							{submitting ? (
+								<>
+									<Loader2 className="size-4 animate-spin" />
+									Salvando...
+								</>
+							) : (
+								"Salvar alterações"
+							)}
+						</Button>
+					</div>
+				</form>
+			</div>
+		</div>
+	);
+}
 
 export default function Page() {
 	const nav = useNavigate();
@@ -16,6 +355,7 @@ export default function Page() {
 	const [query, setQuery] = useState("");
 	const [target, setTarget] = useState();
 	const [deleting, setDeleting] = useState(false);
+	const [editingItem, setEditingItem] = useState(null);
 
 	useEffect(() => {
 		if (!isLoading && !isLoggedIn) {
@@ -141,6 +481,14 @@ export default function Page() {
 								<Button
 									variant="ghost"
 									size="icon"
+									aria-label="Editar anúncio"
+									onClick={() => setEditingItem(item)}
+								>
+									<Pencil className="size-4 text-foreground hover:text-primary transition-colors" />
+								</Button>
+								<Button
+									variant="ghost"
+									size="icon"
 									aria-label="Excluir anúncio"
 									onClick={() => setTarget(item.id)}
 								>
@@ -194,6 +542,20 @@ export default function Page() {
 						</div>
 					</div>
 				</div>
+			)}
+
+			{editingItem && (
+				<EditAnnounceModal
+					item={editingItem}
+					onClose={() => setEditingItem(null)}
+					onSave={(updatedItem) => {
+						setItems((prev) =>
+							prev.map((x) =>
+								x.id === updatedItem.id ? { ...x, ...updatedItem } : x
+							)
+						);
+					}}
+				/>
 			)}
 		</div>
 	);

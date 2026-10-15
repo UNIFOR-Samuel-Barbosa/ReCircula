@@ -63,7 +63,7 @@ export function AppShell({ children }) {
 							</Link>
 						)}
 						<Link to="/publicar">
-							<Button size="sm">
+							<Button size="sm" className="cursor-pointer">
 								<Plus className="size-4" />
 								Publicar anúncio
 							</Button>
@@ -74,7 +74,7 @@ export function AppShell({ children }) {
 			</header>
 
 			<main className="pb-24 md:pb-10">{children}</main>
-			
+
 			<nav
 				className="fixed inset-x-0 bottom-0 z-50 grid h-18 grid-cols-4 border-t border-border bg-background/95 px-2 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl md:hidden"
 				aria-label="Navegação móvel"
