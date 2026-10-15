@@ -375,6 +375,7 @@ export default function Page() {
 									image: item.image_url,
 									created_at: item.created_at,
 									seller: user.name,
+									sellerPhoto: user.photo_url,
 									course: user.telephone ?? "",
 								}}
 							/>

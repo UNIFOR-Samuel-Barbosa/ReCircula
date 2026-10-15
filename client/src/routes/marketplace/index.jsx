@@ -29,6 +29,7 @@ export default function Index() {
 						created_at: x.created_at,
 						image: x.image_url,
 						seller: x.user?.name || "Estudante",
+						sellerPhoto: x.user?.photo_url,
 						sellerId: x.user_id,
 						course: x.user?.telephone || "Estudante UNIFOR",
 						description: x.description,

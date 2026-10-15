@@ -5,6 +5,19 @@ import { formatRelativeTime } from "../lib/formatters";
 
 export function ListingCard({ item }) {
 	const publishedAt = formatRelativeTime(item.created_at ?? item.createdAt);
+	const sellerPhoto =
+		item.sellerPhoto ||
+		item.seller_photo ||
+		item.user?.photo_url ||
+		item.photo_url ||
+		item.seller?.photo_url;
+	const initials = (item.seller || "U")
+		.trim()
+		.split(/\s+/)
+		.map((part) => part[0])
+		.slice(0, 2)
+		.join("")
+		.toUpperCase();
 
 	return (
 		<article className="group overflow-hidden rounded-lg border border-border bg-card transition-colors hover:border-card-hover">
@@ -39,12 +52,17 @@ export function ListingCard({ item }) {
 						{formatPrice(item)}
 					</p>
 					<div className="mt-4 flex items-center gap-2 border-t border-border pt-3 text-xs text-muted-foreground">
-						<span className="grid size-6 place-items-center rounded-full bg-secondary font-bold text-foreground">
-							{item.seller
-								.split(" ")
-								.map((part) => part[0])
-								.slice(0, 2)
-								.join("")}
+						<span className="relative grid size-6 shrink-0 place-items-center overflow-hidden rounded-full bg-secondary font-bold text-foreground">
+							{sellerPhoto ? (
+								<img
+									src={sellerPhoto}
+									alt={item.seller || "Vendedor"}
+									className="size-full object-cover"
+									loading="lazy"
+								/>
+							) : (
+								<span className="text-[10px]">{initials}</span>
+							)}
 						</span>
 						<span className="truncate">{item.seller}</span>
 						{publishedAt && (

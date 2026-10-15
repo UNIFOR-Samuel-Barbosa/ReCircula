@@ -162,8 +162,16 @@ export default function Page() {
 									key={u.id}
 									className="flex items-center gap-4 rounded-lg border border-border bg-card p-4 shadow-sm"
 								>
-									<div className="grid size-11 shrink-0 place-items-center rounded-full bg-secondary text-sm font-bold">
-										{initials}
+									<div className="grid size-11 shrink-0 place-items-center overflow-hidden rounded-full bg-secondary text-sm font-bold">
+										{u.photo_url ? (
+											<img
+												src={u.photo_url}
+												alt={u.name || "Foto do usuário"}
+												className="size-full object-cover"
+											/>
+										) : (
+											initials
+										)}
 									</div>
 									<div className="min-w-0 flex-1">
 										<div className="flex items-center gap-2">
