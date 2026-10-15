@@ -246,6 +246,15 @@ export const profileApi = {
 			method: "DELETE",
 		});
 	},
+
+	async uploadPhoto(file) {
+		const formData = new FormData();
+		formData.append("image", file);
+		return apiRequest("/upload", {
+			method: "POST",
+			body: formData,
+		});
+	},
 };
 
 // Métodos de Anúncios

@@ -1,10 +1,10 @@
-import { PassThrough } from "node:stream";
+import { Readable } from "node:stream";
 
 import cloudinary from "../config/cloudinary.js";
 
 import { AppError } from "../utils/AppError.js";
 
-const MAX_MB_FILE_SIZE = 32;
+const MAX_MB_FILE_SIZE = 10;
 const MAX_FILE_SIZE = MAX_MB_FILE_SIZE * 1024 * 1024;
 
 const ALLOWED_TYPES = ["image/png", "image/jpeg", "image/webp"];
@@ -44,17 +44,21 @@ export async function uploadImage(file) {
 				}
 			);
 
-			const bufferStream = new PassThrough();
+			stream.on("error", (err) => {
+				reject(err);
+			});
 
-			bufferStream.end(file.buffer);
-			bufferStream.pipe(stream);
+			Readable.from(file.buffer).pipe(stream);
 		});
 
 		return result.secure_url;
 	} catch (error) {
 		console.error("Cloudinary upload error:", error);
 
-		throw new AppError("Não foi possível enviar a imagem.", 500);
+		const errorMessage =
+			error?.message || error?.error?.message || "Não foi possível enviar a imagem.";
+
+		throw new AppError(errorMessage, error?.http_code || 500);
 	}
 }
 
