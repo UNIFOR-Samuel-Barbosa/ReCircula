@@ -34,6 +34,7 @@ export default function Page() {
 						setProfile({
 							id: sample.sellerId,
 							name: sample.seller,
+							photo_url: sample.sellerPhoto || sample.photo_url || null,
 							biography:
 								"Materiais bem cuidados, negociação transparente e entrega dentro do campus.",
 						});
@@ -126,6 +127,7 @@ export default function Page() {
 							image: x.image_url || x.image,
 							created_at: x.created_at,
 							seller: profile.name,
+							sellerPhoto: profile.photo_url,
 							course: profile.telephone || "Estudante",
 						}}
 					/>
