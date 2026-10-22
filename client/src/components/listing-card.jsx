@@ -1,7 +1,7 @@
 import { Link } from "./link";
 import { Gift } from "lucide-react";
-import { formatPrice } from "../lib/demo-data";
-import { formatRelativeTime } from "../lib/formatters";
+
+import { formatRelativeTime, formatPrice } from "../lib/formatters";
 
 export function ListingCard({ item }) {
 	const publishedAt = formatRelativeTime(item.created_at ?? item.createdAt);

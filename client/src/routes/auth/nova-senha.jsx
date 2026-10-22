@@ -4,7 +4,7 @@ import { AlertCircle, Loader2 } from "lucide-react";
 import { Link } from "../../components/link";
 import { Button, Field, Input } from "../../components/ui";
 
-import { useAuth } from "../../context/auth/AuthProvider";
+import { useAuth } from "../../hooks/useAuth";
 
 import { useNavigate } from "../../hooks/useNavigation";
 

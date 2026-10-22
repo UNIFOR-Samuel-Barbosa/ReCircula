@@ -6,12 +6,20 @@ import {
 	useCallback,
 } from "react";
 import { Camera, Edit3, LogOut, Loader2, Plus, Sparkles } from "lucide-react";
+
 import { ListingCard } from "../../components/listing-card";
 import { Button, Field, Input, Textarea } from "../../components/ui";
-import { useNavigate } from "../../hooks/useNavigation";
 import { Link } from "../../components/link";
 import { ProfileAvatar } from "../../components/profile-avatar";
-import { useAuth } from "../../context/auth/AuthProvider";
+
+import { useNavigate } from "../../hooks/useNavigation";
+import { useAuth } from "../../hooks/useAuth";
+
+import {
+	formatTelephone,
+	getCountryCodeFromTelephone,
+	normalizeTelephone,
+} from "../../lib/formatters";
 import { announceApi, profileApi } from "../../services/api";
 import {
 	buildCacheKey,
@@ -19,11 +27,6 @@ import {
 	writeCacheEntry,
 } from "../../services/cache";
 import { showToast } from "../../services/toast";
-import {
-	formatTelephone,
-	getCountryCodeFromTelephone,
-	normalizeTelephone,
-} from "../../lib/formatters";
 
 export default function Page() {
 	const nav = useNavigate();

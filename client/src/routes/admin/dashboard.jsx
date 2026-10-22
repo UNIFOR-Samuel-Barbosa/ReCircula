@@ -4,9 +4,9 @@ import { ShieldAlert, Trash2, Loader2 } from "lucide-react";
 import { Button } from "../../components/ui";
 import { Link } from "../../components/link";
 
-import { useAuth } from "../../context/auth/AuthProvider";
+import { useAuth } from "../../hooks/useAuth";
 
-import { formatPrice } from "../../lib/demo-data";
+import { formatPrice } from "@/lib/formatters";
 import { profileApi, announceApi } from "../../services/api";
 import {
 	buildCacheKey,

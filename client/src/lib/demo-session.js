@@ -1,4 +1,4 @@
-import { useAuth } from "../context/auth/AuthProvider";
+import { useAuth } from "../hooks/useAuth";
 
 /**
  * Hook de sessão integrado com a API real e autenticação JWT/bcrypt.

@@ -2,7 +2,7 @@ import { Link } from "./link";
 import { useNavigate } from "../hooks/useNavigation";
 import { useEffect, useRef, useState } from "react";
 import { LayoutDashboard, LogOut, UserRound } from "lucide-react";
-import { useAuth } from "../context/auth/AuthProvider";
+import { useAuth } from "../hooks/useAuth";
 
 const itemClass =
 	"flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm text-foreground transition-colors hover:bg-accent";

@@ -1,7 +1,7 @@
 import { Button } from "./ui";
 import { Link } from "./link";
 import { ProfileMenu } from "./profile-menu";
-import { useAuth } from "../context/auth/AuthProvider";
+import { useAuth } from "../hooks/useAuth";
 import { Home, LayoutGrid, Plus, UserRound, LogIn } from "lucide-react";
 
 import recirculaLogo from "../assets/recircula-logo.png";

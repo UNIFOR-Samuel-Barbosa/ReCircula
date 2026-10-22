@@ -3,7 +3,7 @@ import { Gift, ImagePlus, Loader2 } from "lucide-react";
 
 import { Button, Field, Input, Select, Textarea } from "../../components/ui";
 
-import { useAuth } from "../../context/auth/AuthProvider";
+import { useAuth } from "../../hooks/useAuth";
 
 import { useNavigate } from "../../hooks/useNavigation";
 import { categories } from "../../hooks/useCategories";

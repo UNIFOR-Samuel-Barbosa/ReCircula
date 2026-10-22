@@ -1,4 +1,3 @@
-import { Link } from "../../components/link";
 import { useEffect, useMemo, useState, useCallback } from "react";
 import {
 	Plus,
@@ -11,17 +10,21 @@ import {
 	Gift,
 	X,
 } from "lucide-react";
-import { formatPrice } from "../../lib/demo-data";
+
+import { Link } from "../../components/link";
 import { Button, Input, Field, Select, Textarea } from "../../components/ui";
-import { useAuth } from "../../context/auth/AuthProvider";
+
+import { useAuth } from "../../hooks/useAuth";
+import useDebounce from "../../hooks/useDebounce";
+import { useNavigate } from "../../hooks/useNavigation";
+
+import { formatPrice } from "@/lib/formatters";
 import { announceApi } from "../../services/api";
 import {
 	buildCacheKey,
 	readCacheEntry,
 	writeCacheEntry,
 } from "../../services/cache";
-import useDebounce from "../../hooks/useDebounce";
-import { useNavigate } from "../../hooks/useNavigation";
 import { showToast } from "../../services/toast";
 
 const ALLOWED_IMAGE_TYPES = ["image/png", "image/jpeg", "image/webp"];

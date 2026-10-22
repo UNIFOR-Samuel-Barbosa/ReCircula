@@ -1,17 +1,20 @@
 import { useEffect, useState } from "react";
-import { Link } from "../../components/link";
-import { useParams } from "../../hooks/useNavigation";
 import { ArrowLeft, MessageCircle, ShieldCheck, Loader2 } from "lucide-react";
-import { formatPrice } from "../../lib/demo-data";
+
+import { Link } from "../../components/link";
+
+import { useParams } from "../../hooks/useNavigation";
+
 import {
 	buildWhatsappNumber,
 	formatRelativeTime,
 	getCountryCodeFromTelephone,
 	normalizeTelephone,
+	formatPrice,
 } from "../../lib/formatters";
 import { Button } from "../../components/ui";
 import { announceApi } from "../../services/api";
-import { useAuth } from "../../context/auth/AuthProvider";
+import { useAuth } from "../../hooks/useAuth";
 
 export default function Page() {
 	const { id } = useParams();

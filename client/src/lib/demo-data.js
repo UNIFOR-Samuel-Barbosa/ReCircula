@@ -99,11 +99,3 @@ export const currentUser = {
 	phone: "(85) 99999-1204",
 	bio: "Dou uma nova vida aos materiais que já cumpriram seu papel comigo. Entregas no campus de segunda a quinta.",
 };
-export function formatPrice(item) {
-	return item.donation
-		? "Doação"
-		: (item.price?.toLocaleString("pt-BR", {
-				style: "currency",
-				currency: "BRL",
-			}) ?? "A combinar");
-}

@@ -84,3 +84,12 @@ export function formatTelephone(value, options = {}) {
 	if (!visualCountryCode) return formatted;
 	return `+${visualCountryCode} ${formatted}`;
 }
+
+export function formatPrice(item) {
+	return item.donation
+		? "Doação"
+		: (item.price?.toLocaleString("pt-BR", {
+				style: "currency",
+				currency: "BRL",
+			}) ?? "A combinar");
+}

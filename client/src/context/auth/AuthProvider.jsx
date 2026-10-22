@@ -8,8 +8,6 @@ import {
 import { AuthContext } from "./auth-context";
 import { ensureOnlineForAuthAction } from "./auth-helpers";
 
-export { useAuth } from "../../hooks/useAuth";
-
 export function AuthProvider({ children }) {
 	const [user, setUser] = useState(() => getStoredUser());
 	const [token, setToken] = useState(() => getAccessToken());
