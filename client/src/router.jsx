@@ -4,8 +4,8 @@ import { Loader2 } from "lucide-react";
 import { AppShell } from "./components/app-shell";
 import { Link } from "./components/link";
 
-import { NavigationProvider } from "./context/NavigationContext";
-import { AuthProvider } from "./context/AuthContext";
+import { NavigationProvider } from "./context/navigation/NavigationProvider";
+import { AuthProvider } from "./context/auth/AuthProvider";
 
 import { matchRoute } from "./lib/routes";
 import { ToastProvider } from "./services/toast";

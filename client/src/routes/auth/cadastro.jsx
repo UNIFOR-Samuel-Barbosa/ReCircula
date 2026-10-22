@@ -3,7 +3,7 @@ import { Link } from "../../components/link";
 import { useNavigate } from "../../hooks/useNavigation";
 import { Loader2 } from "lucide-react";
 import { Button, Field, Input } from "../../components/ui";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../context/auth/AuthProvider";
 import { showToast } from "../../services/toast";
 
 export default function Page() {

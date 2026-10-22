@@ -1,5 +1,5 @@
 import { useCallback, useContext } from "react";
-import { NavigationContext } from "../context/NavigationContext";
+import { NavigationContext } from "../context/navigation/navigation-context";
 
 export function buildHref(to, params = {}, search) {
 	const pathname = to.replace(/\$([\w]+)/g, (_, key) => {

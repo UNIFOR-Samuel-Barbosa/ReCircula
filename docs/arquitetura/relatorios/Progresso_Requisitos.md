@@ -47,6 +47,6 @@ Considerando o estado atual do sistema/projeto e os requisitos da documentação
 - [ x ] RN03 — Somente o dono do anúncio pode editá-lo ou excluí-lo.
 - [ x ] RN04 — Somente o dono do perfil pode editá-lo.
 - [ x ] RN05 — O botão de contato via WhatsApp só é exibido ao visualizar o perfil de outro usuário.
-- [ ] RN06 — Operações de escrita requerem conexão com a internet(tratamento de error amigável).
+- [ x ] RN06 — Operações de escrita requerem conexão com a internet (tratamento de erro amigável).
 - [ x ] RN07 — O campo telefone é formatado automaticamente conforme o usuário digita.
-- [ ] RN08 — A biografia do perfil está limitada a 150 caracteres tanto no backend quanto no campo de edição do frontend.
+- [ x ] RN08 — A biografia do perfil está limitada a 150 caracteres tanto no backend quanto no campo de edição do frontend.

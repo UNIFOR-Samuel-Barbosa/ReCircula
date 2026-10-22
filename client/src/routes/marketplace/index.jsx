@@ -137,13 +137,10 @@ export default function Index() {
 
 	const hasCurrentState = listingState.key === requestKey;
 	const hasCachedListings = Boolean(readCacheEntry(requestKey));
-	const activeListings = useMemo(
-		() =>
-			hasCurrentState
-				? listingState.data
-				: (readCacheEntry(requestKey) ?? []),
-		[hasCurrentState, listingState.data, requestKey]
-	);
+	const activeListings = useMemo(() => {
+		const nextItems = hasCurrentState ? listingState.data : readCacheEntry(requestKey) ?? [];
+		return Array.isArray(nextItems) ? nextItems : [];
+	}, [hasCurrentState, listingState.data, requestKey]);
 	const isLoading = hasCurrentState ? listingState.loading : !hasCachedListings;
 	const loadError = hasCurrentState ? listingState.error : null;
 	const orderedListings = useMemo(() => {

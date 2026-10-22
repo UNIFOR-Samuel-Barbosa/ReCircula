@@ -11,7 +11,7 @@ import {
 } from "../../lib/formatters";
 import { Button } from "../../components/ui";
 import { announceApi } from "../../services/api";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../context/auth/AuthProvider";
 
 export default function Page() {
 	const { id } = useParams();
@@ -71,7 +71,9 @@ export default function Page() {
 
 	const phoneDigits = normalizeTelephone(item.phone);
 	const countryCode = getCountryCodeFromTelephone(item.phone || "");
-	const cleanPhone = phoneDigits ? buildWhatsappNumber(phoneDigits, countryCode || "") : "";
+	const cleanPhone = phoneDigits
+		? buildWhatsappNumber(phoneDigits, countryCode || "")
+		: "";
 	const isOwnListing =
 		user?.id != null &&
 		item.sellerId != null &&
@@ -146,7 +148,9 @@ export default function Page() {
 							<span>
 								<strong className="block">{item.seller || "Usuário"}</strong>
 								<small className="text-muted-foreground">
-									{item.sellerRole === "admin" ? "Administrador" : "Usuário ReCircula"}
+									{item.sellerRole === "admin"
+										? "Administrador"
+										: "Usuário ReCircula"}
 								</small>
 							</span>
 							<span className="ml-auto text-sm text-primary">Ver perfil</span>

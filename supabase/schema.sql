@@ -13,7 +13,10 @@ create table profiles (
     role text not null default 'user'
         check (role in ('user', 'admin')),
 
-    created_at timestamptz default now()
+    created_at timestamptz default now(),
+
+    constraint profiles_biography_length_check
+        check (biography is null or length(biography) <= 150)
 );
 
 create table announces (

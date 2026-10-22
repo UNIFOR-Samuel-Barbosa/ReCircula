@@ -1,3 +1,5 @@
+import { assertWriteOnline } from "./network";
+
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3001";
 
 const ACCESS_TOKEN_KEY = "recircula_access_token";
@@ -71,6 +73,13 @@ export async function apiRequest(endpoint, options = {}) {
 
 	const requestHeaders = { ...headers };
 	const isFormData = typeof FormData !== "undefined" && body instanceof FormData;
+	const isWriteMethod = ["POST", "PUT", "PATCH", "DELETE"].includes(
+		String(method).toUpperCase()
+	);
+
+	if (isWriteMethod && typeof navigator !== "undefined" && !navigator.onLine) {
+		assertWriteOnline("Esta ação");
+	}
 
 	if (!isFormData && body && !requestHeaders["Content-Type"]) {
 		requestHeaders["Content-Type"] = "application/json";
@@ -93,7 +102,12 @@ export async function apiRequest(endpoint, options = {}) {
 	try {
 		response = await fetch(url, config);
 	} catch {
-		throw new Error("Não foi possível conectar ao servidor. Verifique se a API está em execução.");
+		if (typeof navigator !== "undefined" && !navigator.onLine) {
+			assertWriteOnline("Esta ação");
+		}
+		throw new Error(
+			"Não foi possível conectar ao servidor. Verifique se a API está em execução."
+		);
 	}
 
 	// Token expirado: tenta renovar via refresh token (apenas 1 tentativa)

@@ -4,11 +4,15 @@ import { ShieldAlert, Trash2, Loader2 } from "lucide-react";
 import { Button } from "../../components/ui";
 import { Link } from "../../components/link";
 
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../context/auth/AuthProvider";
 
 import { formatPrice } from "../../lib/demo-data";
 import { profileApi, announceApi } from "../../services/api";
-import { buildCacheKey, readCacheEntry, writeCacheEntry } from "../../services/cache";
+import {
+	buildCacheKey,
+	readCacheEntry,
+	writeCacheEntry,
+} from "../../services/cache";
 import { showToast } from "../../services/toast";
 
 export default function Page() {
@@ -21,7 +25,9 @@ export default function Page() {
 	const [actionLoading, setActionLoading] = useState(false);
 
 	const loadData = useCallback(async () => {
-		const cacheKey = buildCacheKey("admin:dashboard", { userId: user?.id || "anonymous" });
+		const cacheKey = buildCacheKey("admin:dashboard", {
+			userId: user?.id || "anonymous",
+		});
 		const cachedDashboard = readCacheEntry(cacheKey);
 		if (cachedDashboard) {
 			setUsers((cachedDashboard.users || []).filter((u) => u.id !== user?.id));
@@ -207,10 +213,7 @@ export default function Page() {
 										</p>
 									</div>
 									<div className="flex items-center gap-2">
-										<Link
-											to="/usuario/$id"
-											params={{ id: u.id }}
-										>
+										<Link to="/usuario/$id" params={{ id: u.id }}>
 											<Button size="sm" variant="secondary">
 												Ver Perfil
 											</Button>

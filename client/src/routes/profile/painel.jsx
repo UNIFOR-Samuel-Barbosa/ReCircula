@@ -13,9 +13,13 @@ import {
 } from "lucide-react";
 import { formatPrice } from "../../lib/demo-data";
 import { Button, Input, Field, Select, Textarea } from "../../components/ui";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../context/auth/AuthProvider";
 import { announceApi } from "../../services/api";
-import { buildCacheKey, readCacheEntry, writeCacheEntry } from "../../services/cache";
+import {
+	buildCacheKey,
+	readCacheEntry,
+	writeCacheEntry,
+} from "../../services/cache";
 import useDebounce from "../../hooks/useDebounce";
 import { useNavigate } from "../../hooks/useNavigation";
 import { showToast } from "../../services/toast";
@@ -134,8 +138,8 @@ function EditAnnounceModal({ item, onClose, onSave }) {
 			const numericPrice = donation
 				? null
 				: price !== ""
-				? parseFloat(price)
-				: null;
+					? parseFloat(price)
+					: null;
 
 			const payload = {
 				title: title.trim(),
