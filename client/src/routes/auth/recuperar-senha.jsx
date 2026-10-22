@@ -1,11 +1,15 @@
 import { useState } from "react";
-import { Link } from "../../components/link";
-import { Button, Field, Input } from "../../components/ui";
-import { showToast } from "../../services/toast";
-import { authApi } from "../../services/api";
 import { Loader2, CheckCircle2 } from "lucide-react";
 
+import { Link } from "../../components/link";
+import { Button, Field, Input } from "../../components/ui";
+
+import { useAuth } from "../../hooks/useAuth";
+
+import { showToast } from "../../services/toast";
+
 export default function Page() {
+	const { forgotPassword } = useAuth();
 	const [email, setEmail] = useState("");
 	const [loading, setLoading] = useState(false);
 	const [sent, setSent] = useState(false);
@@ -15,7 +19,7 @@ export default function Page() {
 		setLoading(true);
 
 		try {
-			await authApi.forgotPassword(email);
+			await forgotPassword(email);
 			setSent(true);
 			showToast({
 				text: "Instruções enviadas! Verifique sua caixa de entrada.",
@@ -46,8 +50,8 @@ export default function Page() {
 							E-mail enviado!
 						</h2>
 						<p className="mt-1 text-sm text-muted-foreground">
-							Confira seu e-mail <strong>{email}</strong> , você
-							receberá o link para criar uma nova senha.
+							Confira seu e-mail <strong>{email}</strong> , você receberá o link
+							para criar uma nova senha.
 						</p>
 						{/* Em ambiente local/desenvolvimento sem chave de e-mail, confira o
 						console do servidor */}

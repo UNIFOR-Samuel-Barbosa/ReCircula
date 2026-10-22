@@ -1,13 +1,18 @@
 import { useState, useEffect } from "react";
-import { Link } from "../../components/link";
-import { useNavigate } from "../../hooks/useNavigation";
-import { Button, Field, Input } from "../../components/ui";
-import { showToast } from "../../services/toast";
-import { authApi } from "../../services/api";
 import { AlertCircle, Loader2 } from "lucide-react";
+
+import { Link } from "../../components/link";
+import { Button, Field, Input } from "../../components/ui";
+
+import { useAuth } from "../../hooks/useAuth";
+
+import { useNavigate } from "../../hooks/useNavigation";
+
+import { showToast } from "../../services/toast";
 
 export default function Page() {
 	const nav = useNavigate();
+	const { resetPassword } = useAuth();
 	const [token, setToken] = useState("");
 	const [password, setPassword] = useState("");
 	const [confirmPassword, setConfirmPassword] = useState("");
@@ -40,7 +45,7 @@ export default function Page() {
 		setLoading(true);
 
 		try {
-			await authApi.resetPassword({ token, password });
+			await resetPassword({ token, password });
 			showToast({
 				text: "Sua senha foi alterada com sucesso! Faça login com a nova senha.",
 				color: "green",

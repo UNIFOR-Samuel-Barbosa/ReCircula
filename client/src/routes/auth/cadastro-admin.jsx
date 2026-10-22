@@ -1,9 +1,12 @@
 import { useState } from "react";
-import { Link } from "../../components/link";
-import { useNavigate } from "../../hooks/useNavigation";
 import { ShieldCheck, Loader2 } from "lucide-react";
+
+import { Link } from "../../components/link";
 import { Button, Field, Input } from "../../components/ui";
-import { useAuth } from "../../context/AuthContext";
+
+import { useNavigate } from "../../hooks/useNavigation";
+import { useAuth } from "../../hooks/useAuth";
+
 import { showToast } from "../../services/toast";
 
 export default function Page() {

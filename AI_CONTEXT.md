@@ -11,7 +11,7 @@ ReCircula é um marketplace universitário para compra, venda e doação de mate
 
 ## Arquitetura e estado atual
 - `client/` e `server/` são projetos npm independentes; não há manifest de dependências na raiz.
-- O cliente chama a API por `client/src/services/api.js`; autenticação e estado de sessão são centralizados em `client/src/context/AuthContext.jsx`.
+- O cliente chama a API por `client/src/services/api.js`; autenticação e estado de sessão são centralizados em [AuthProvider.jsx](./client/src/context/auth/AuthProvider.jsx).
 - A vitrine usa a API quando há anúncios, mas recorre a dados demonstrativos quando a lista está vazia ou a requisição falha.
 - A API usa a Service Role Key para acessar o Supabase; não exponha credenciais do servidor ao cliente.
 
@@ -30,13 +30,13 @@ Leia somente o guia especializado pertinente à tarefa; confirme sempre o compor
 - [Lacunas e divergências verificadas](./docs/ai/KNOWN_ISSUES.md)
 
 ## Navegação por tarefa
-- Autenticação: `client/src/context/AuthContext.jsx`, `client/src/services/api.js`, `server/src/routes/auth.routes.js`, `server/src/services/auth.service.js`; veja também [docs/decisoes/Auth.md](./docs/decisoes/Auth.md).
+- Autenticação: [AuthProvider.jsx](./client/src/context/auth/AuthProvider.jsx), `client/src/services/api.js`, `server/src/routes/auth.routes.js`, `server/src/services/auth.service.js`; veja também [docs/decisoes/Auth.md](./docs/decisoes/Auth.md).
 - Anúncios: `client/src/routes/marketplace/`, `client/src/routes/profile/painel.jsx`, `server/src/routes/announces.routes.js` e camadas correspondentes.
 - Perfis e administração: `client/src/routes/profile/`, `client/src/routes/admin/dashboard.jsx`, `server/src/routes/profiles.routes.js`.
 - Imagens: `client/src/services/api.js`, `server/src/routes/upload.routes.js`, `server/src/services/storage.service.js`.
 - Produto e requisitos: [docs/README.md](./docs/README.md) e [docs/arquitetura/relatorios/Escopo_do_Sistema.md](./docs/arquitetura/relatorios/Escopo_do_Sistema.md).
 
 ## Manutenção
-- Última verificação do contexto: 2026-10-15.
-- Conferidos: mudanças recentes do cliente (API, autenticação, perfis e upload), manifests/scripts, principais rotas e serviços, schema/policies SQL e documentação existente.
+- Última verificação do contexto: 2026-10-22.
+- Nesta atualização, conferidos: referências de autenticação em `client/src/router.jsx` e [AuthProvider.jsx](./client/src/context/auth/AuthProvider.jsx), e links para os guias especializados. A validação anterior de API, perfis, upload, manifests/scripts, rotas/serviços e schema/policies SQL é de 2026-10-15.
 - Não foram executados build, lint, testes ou validação contra serviços remotos. Ver [KNOWN_ISSUES.md](./docs/ai/KNOWN_ISSUES.md) para divergências documentais e comportamentos que exigem atenção.

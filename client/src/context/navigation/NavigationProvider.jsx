@@ -1,6 +1,4 @@
-import { createContext } from "react";
-
-export const NavigationContext = createContext({ pathname: "/", params: {} });
+import { NavigationContext } from "./navigation-context";
 
 export function NavigationProvider({ pathname, params, children }) {
 	return (

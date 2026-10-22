@@ -6,19 +6,27 @@ import {
 	useCallback,
 } from "react";
 import { Camera, Edit3, LogOut, Loader2, Plus, Sparkles } from "lucide-react";
+
 import { ListingCard } from "../../components/listing-card";
 import { Button, Field, Input, Textarea } from "../../components/ui";
-import { useNavigate } from "../../hooks/useNavigation";
 import { Link } from "../../components/link";
 import { ProfileAvatar } from "../../components/profile-avatar";
-import { useAuth } from "../../context/AuthContext";
-import { announceApi, profileApi } from "../../services/api";
-import { showToast } from "../../services/toast";
+
+import { useNavigate } from "../../hooks/useNavigation";
+import { useAuth } from "../../hooks/useAuth";
+
 import {
 	formatTelephone,
 	getCountryCodeFromTelephone,
 	normalizeTelephone,
 } from "../../lib/formatters";
+import { announceApi, profileApi } from "../../services/api";
+import {
+	buildCacheKey,
+	readCacheEntry,
+	writeCacheEntry,
+} from "../../services/cache";
+import { showToast } from "../../services/toast";
 
 export default function Page() {
 	const nav = useNavigate();
@@ -42,27 +50,30 @@ export default function Page() {
 	const pendingTelephoneCaret = useRef(null);
 	const pendingCountryCodeCaret = useRef(null);
 
-	const resetFormFromProfile = useCallback((profile = user) => {
-		if (!profile) return;
+	const resetFormFromProfile = useCallback(
+		(profile = user) => {
+			if (!profile) return;
 
-		setName(profile.name || "");
-		setBiography(profile.biography || "");
-		const storedDigits = String(profile.telephone || "").replace(/\D/g, "");
-		const countryCodeDigits = getCountryCodeFromTelephone(storedDigits);
+			setName(profile.name || "");
+			setBiography(profile.biography || "");
+			const storedDigits = String(profile.telephone || "").replace(/\D/g, "");
+			const countryCodeDigits = getCountryCodeFromTelephone(storedDigits);
 
-		setIncludeCountryCode(Boolean(countryCodeDigits));
-		setCountryCode(countryCodeDigits);
-		setTelephone(normalizeTelephone(storedDigits));
+			setIncludeCountryCode(Boolean(countryCodeDigits));
+			setCountryCode(countryCodeDigits);
+			setTelephone(normalizeTelephone(storedDigits));
 
-		setPhotoFile(null);
-		setPhotoPreview((prev) => {
-			if (prev) URL.revokeObjectURL(prev);
-			return null;
-		});
-		if (fileInputRef.current) {
-			fileInputRef.current.value = "";
-		}
-	}, [user]);
+			setPhotoFile(null);
+			setPhotoPreview((prev) => {
+				if (prev) URL.revokeObjectURL(prev);
+				return null;
+			});
+			if (fileInputRef.current) {
+				fileInputRef.current.value = "";
+			}
+		},
+		[user]
+	);
 
 	useEffect(() => {
 		return () => {
@@ -101,20 +112,33 @@ export default function Page() {
 	}, [resetFormFromProfile, user]);
 
 	useEffect(() => {
-		if (isLoggedIn) {
-			announceApi
-				.getMine()
-				.then((items) => {
-					setUserAnnounces(items || []);
-				})
-				.catch((err) => {
-					console.warn("Não foi possível carregar anúncios do usuário:", err);
-				})
-				.finally(() => {
-					setLoadingAnnounces(false);
-				});
+		if (!isLoggedIn) return;
+
+		const cacheKey = buildCacheKey("profile:announces", {
+			userId: user?.id || "me",
+		});
+		const cachedItems = readCacheEntry(cacheKey);
+		if (cachedItems) {
+			setUserAnnounces(cachedItems);
 		}
-	}, [isLoggedIn]);
+
+		announceApi
+			.getMine()
+			.then((items) => {
+				const nextItems = items || [];
+				writeCacheEntry(cacheKey, nextItems);
+				setUserAnnounces(nextItems);
+			})
+			.catch((err) => {
+				console.warn("Não foi possível carregar anúncios do usuário:", err);
+				if (!cachedItems) {
+					setUserAnnounces([]);
+				}
+			})
+			.finally(() => {
+				setLoadingAnnounces(false);
+			});
+	}, [isLoggedIn, user?.id]);
 
 	if (isLoading || !user) {
 		return (
@@ -172,8 +196,7 @@ export default function Page() {
 	const handleTelephoneKeyDown = (event) => {
 		if (
 			(event.key !== "Backspace" && event.key !== "Delete") ||
-			event.currentTarget.selectionStart !==
-				event.currentTarget.selectionEnd
+			event.currentTarget.selectionStart !== event.currentTarget.selectionEnd
 		) {
 			return;
 		}
@@ -266,7 +289,10 @@ export default function Page() {
 			const sanitizedCountryCode = includeCountryCode
 				? countryCode.replace(/\D/g, "").slice(0, 3)
 				: "";
-			const savedTelephone = [sanitizedCountryCode, normalizeTelephone(telephone)]
+			const savedTelephone = [
+				sanitizedCountryCode,
+				normalizeTelephone(telephone),
+			]
 				.filter(Boolean)
 				.join("");
 
@@ -430,7 +456,9 @@ export default function Page() {
 										disabled={saving}
 									>
 										<Camera className="size-3.5" />
-										{photoPreview || user.photo_url ? "Alterar foto" : "Adicionar foto"}
+										{photoPreview || user.photo_url
+											? "Alterar foto"
+											: "Adicionar foto"}
 									</Button>
 									{photoFile && (
 										<Button
@@ -444,7 +472,8 @@ export default function Page() {
 													if (prev) URL.revokeObjectURL(prev);
 													return null;
 												});
-												if (fileInputRef.current) fileInputRef.current.value = "";
+												if (fileInputRef.current)
+													fileInputRef.current.value = "";
 											}}
 											disabled={saving}
 										>
@@ -474,9 +503,9 @@ export default function Page() {
 									disabled={saving}
 								/>
 							</Field>
-							<Field label="Biografia" hint="Até 500 caracteres.">
+							<Field label="Biografia" hint="Até 150 caracteres.">
 								<Textarea
-									maxLength={500}
+									maxLength={150}
 									value={biography}
 									onChange={(e) => setBiography(e.target.value)}
 									placeholder="Conte um pouco sobre você e seus materiais..."

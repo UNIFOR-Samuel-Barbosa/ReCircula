@@ -8,7 +8,7 @@ Aplicação web em dois projetos npm: SPA React em `client/` e API REST Express 
 
 - Entrada: `client/src/main.jsx` monta `AppRouter`.
 - `client/src/router.jsx` fornece autenticação, navegação, shell e notificações; `client/src/lib/routes.js` associa URLs às telas com carregamento lazy.
-- `client/src/context/AuthContext.jsx` mantém usuário, token e operações de sessão.
+- [AuthProvider.jsx](../../client/src/context/auth/AuthProvider.jsx) mantém usuário, token e operações de sessão; [router.jsx](../../client/src/router.jsx) envolve a aplicação com esse provider.
 - `client/src/services/api.js` concentra `fetch`, autenticação Bearer, renovação de token e funções para auth, perfis e anúncios.
 - `client/src/routes/` agrupa páginas de `auth/`, `marketplace/`, `profile/` e `admin/`; `client/src/components/` contém UI compartilhada.
 - Componentes em `client/src/components/ui/` seguem o padrão Shadcn/ui e usam Radix/Tailwind; há também implementações próprias em `client/src/components/ui.jsx`.
@@ -32,5 +32,5 @@ Aplicação web em dois projetos npm: SPA React em `client/` e API REST Express 
 
 - Configuração do cliente: `client/vite.config.js`, `client/package.json`.
 - Configuração da API: `server/src/app.js`, `server/src/server.js`, `server/package.json`.
-- Autenticação: `client/src/context/AuthContext.jsx`, `client/src/services/api.js`, `server/src/config/auth.js`, `server/src/services/auth.service.js`.
+- Autenticação: [AuthProvider.jsx](../../client/src/context/auth/AuthProvider.jsx), `client/src/services/api.js`, `server/src/config/auth.js`, `server/src/services/auth.service.js`.
 - Modelo e políticas: `supabase/schema.sql`, `supabase/policies.sql`.

@@ -2,13 +2,13 @@
 
 ## Sessão e autenticação
 
-1. `AuthContext` expõe login, cadastro, cadastro admin, logout e sincronização do perfil.
+1. [AuthProvider.jsx](../../client/src/context/auth/AuthProvider.jsx) expõe login, cadastro, cadastro admin, logout e sincronização do perfil.
 2. `authApi` em `client/src/services/api.js` chama `/auth/*` e guarda access token, refresh token e usuário em `localStorage`.
 3. Requisições autenticadas enviam `Authorization: Bearer ...`. Em `401`, `apiRequest` coordena uma renovação compartilhada (`refreshPromise`) e tenta novamente uma vez; falha de renovação limpa a sessão.
 4. A API aplica bcrypt às senhas, emite JWT de acesso e armazena hashes de refresh/reset tokens. Refresh é rotacionado; reuso revoga as sessões do usuário.
 5. Recuperação usa `/auth/forgot-password` e `/auth/reset-password`; o link aponta para `/redefinir-senha`, rota registrada no cliente.
 
-Referências: `client/src/context/AuthContext.jsx`, `client/src/services/api.js`, `server/src/routes/auth.routes.js`, `server/src/services/auth.service.js`, `server/src/services/token.service.js`.
+Referências: [AuthProvider.jsx](../../client/src/context/auth/AuthProvider.jsx), `client/src/services/api.js`, `server/src/routes/auth.routes.js`, `server/src/services/auth.service.js`, `server/src/services/token.service.js`.
 
 ## Anúncios
 

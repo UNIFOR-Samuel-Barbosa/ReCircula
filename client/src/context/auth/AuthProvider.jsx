@@ -1,24 +1,12 @@
-import { createContext, useContext, useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback } from "react";
 import {
 	authApi,
 	profileApi,
 	getStoredUser,
 	getAccessToken,
-} from "../services/api";
-
-export const AuthContext = createContext({
-	user: null,
-	token: null,
-	isLoggedIn: false,
-	isAdmin: false,
-	isLoading: true,
-	signIn: async () => {},
-	signUp: async () => {},
-	signUpAdmin: async () => {},
-	signOut: async () => {},
-	updateUser: async () => {},
-	reloadUser: async () => {},
-});
+} from "../../services/api";
+import { AuthContext } from "./auth-context";
+import { ensureOnlineForAuthAction } from "./auth-helpers";
 
 export function AuthProvider({ children }) {
 	const [user, setUser] = useState(() => getStoredUser());
@@ -40,7 +28,6 @@ export function AuthProvider({ children }) {
 		window.addEventListener("recircula_auth_change", handleAuthChange);
 		window.addEventListener("storage", handleAuthChange);
 
-		// Ao carregar, se houver token, atualiza dados frescos do perfil
 		if (getAccessToken()) {
 			profileApi
 				.getMe()
@@ -70,6 +57,7 @@ export function AuthProvider({ children }) {
 	}, [syncState]);
 
 	const signIn = useCallback(async (credentials) => {
+		ensureOnlineForAuthAction("Login");
 		const session = await authApi.login(credentials);
 		setUser(session.user);
 		setToken(session.accessToken);
@@ -77,6 +65,7 @@ export function AuthProvider({ children }) {
 	}, []);
 
 	const signUp = useCallback(async (data) => {
+		ensureOnlineForAuthAction("Cadastro");
 		const session = await authApi.register(data);
 		setUser(session.user);
 		setToken(session.accessToken);
@@ -84,25 +73,39 @@ export function AuthProvider({ children }) {
 	}, []);
 
 	const signUpAdmin = useCallback(async (data) => {
+		ensureOnlineForAuthAction("Cadastro de administrador");
 		const session = await authApi.registerAdmin(data);
 		setUser(session.user);
 		setToken(session.accessToken);
 		return session;
 	}, []);
 
+	const forgotPassword = useCallback(async (email) => {
+		ensureOnlineForAuthAction("Recuperação de senha");
+		return authApi.forgotPassword(email);
+	}, []);
+
+	const resetPassword = useCallback(async ({ token, password }) => {
+		ensureOnlineForAuthAction("Redefinição de senha");
+		return authApi.resetPassword({ token, password });
+	}, []);
+
 	const signOut = useCallback(async () => {
+		ensureOnlineForAuthAction("Logout");
 		await authApi.logout();
 		setUser(null);
 		setToken(null);
 	}, []);
 
 	const updateUser = useCallback(async (data) => {
+		ensureOnlineForAuthAction("Atualização do perfil");
 		const updated = await profileApi.update(data);
 		setUser((prev) => ({ ...(prev || {}), ...updated }));
 		return updated;
 	}, []);
 
 	const reloadUser = useCallback(async () => {
+		ensureOnlineForAuthAction("Sincronização do perfil");
 		const profile = await profileApi.getMe();
 		if (profile) {
 			setUser((prev) => {
@@ -123,18 +126,12 @@ export function AuthProvider({ children }) {
 		signIn,
 		signUp,
 		signUpAdmin,
+		forgotPassword,
+		resetPassword,
 		signOut,
 		updateUser,
 		reloadUser,
 	};
 
 	return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-}
-
-export function useAuth() {
-	const context = useContext(AuthContext);
-	if (!context) {
-		throw new Error("useAuth deve ser utilizado dentro de um AuthProvider");
-	}
-	return context;
 }

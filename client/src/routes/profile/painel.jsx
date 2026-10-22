@@ -1,4 +1,3 @@
-import { Link } from "../../components/link";
 import { useEffect, useMemo, useState, useCallback } from "react";
 import {
 	Plus,
@@ -11,11 +10,21 @@ import {
 	Gift,
 	X,
 } from "lucide-react";
-import { formatPrice } from "../../lib/demo-data";
+
+import { Link } from "../../components/link";
 import { Button, Input, Field, Select, Textarea } from "../../components/ui";
-import { useAuth } from "../../context/AuthContext";
-import { announceApi } from "../../services/api";
+
+import { useAuth } from "../../hooks/useAuth";
+import useDebounce from "../../hooks/useDebounce";
 import { useNavigate } from "../../hooks/useNavigation";
+
+import { formatPrice } from "@/lib/formatters";
+import { announceApi } from "../../services/api";
+import {
+	buildCacheKey,
+	readCacheEntry,
+	writeCacheEntry,
+} from "../../services/cache";
 import { showToast } from "../../services/toast";
 
 const ALLOWED_IMAGE_TYPES = ["image/png", "image/jpeg", "image/webp"];
@@ -132,8 +141,8 @@ function EditAnnounceModal({ item, onClose, onSave }) {
 			const numericPrice = donation
 				? null
 				: price !== ""
-				? parseFloat(price)
-				: null;
+					? parseFloat(price)
+					: null;
 
 			const payload = {
 				title: title.trim(),
@@ -347,12 +356,28 @@ function EditAnnounceModal({ item, onClose, onSave }) {
 	);
 }
 
+function getSearchScore(title = "", query = "") {
+	const normalizedTitle = String(title).trim().toLowerCase();
+	const normalizedQuery = String(query).trim().toLowerCase();
+	if (!normalizedTitle || !normalizedQuery) return 0;
+
+	let score = 0;
+	if (normalizedTitle.includes(normalizedQuery)) score += 100;
+	for (const word of normalizedQuery.split(/\s+/).filter(Boolean)) {
+		if (normalizedTitle.includes(word)) score += 25;
+	}
+	const index = normalizedTitle.indexOf(normalizedQuery);
+	if (index >= 0) score += Math.max(0, 50 - index);
+	return score;
+}
+
 export default function Page() {
 	const nav = useNavigate();
 	const { isLoggedIn, isLoading } = useAuth();
 	const [items, setItems] = useState([]);
 	const [loading, setLoading] = useState(true);
 	const [query, setQuery] = useState("");
+	const debouncedQuery = useDebounce(query, 500);
 	const [target, setTarget] = useState();
 	const [deleting, setDeleting] = useState(false);
 	const [editingItem, setEditingItem] = useState(null);
@@ -365,12 +390,22 @@ export default function Page() {
 
 	const loadAnnounces = useCallback(async () => {
 		if (!isLoggedIn) return;
-		setLoading(true);
+		const cacheKey = buildCacheKey("profile:mine", { userId: "me" });
+		const cachedItems = readCacheEntry(cacheKey);
+		if (cachedItems) {
+			setItems(cachedItems);
+		}
+		setLoading(!cachedItems);
 		try {
 			const res = await announceApi.getMine();
-			setItems(res || []);
+			const nextItems = res || [];
+			writeCacheEntry(cacheKey, nextItems);
+			setItems(nextItems);
 		} catch (err) {
 			console.warn("Erro ao buscar anúncios:", err);
+			if (!cachedItems) {
+				setItems([]);
+			}
 		} finally {
 			setLoading(false);
 		}
@@ -382,11 +417,16 @@ export default function Page() {
 		}
 	}, [isLoggedIn, loadAnnounces]);
 
-	const shown = useMemo(
-		() =>
-			items.filter((x) => x.title.toLowerCase().includes(query.toLowerCase())),
-		[items, query]
-	);
+	const shown = useMemo(() => {
+		const nextItems = [...items];
+		const normalizedQuery = debouncedQuery.trim().toLowerCase();
+		if (!normalizedQuery) return nextItems;
+		return nextItems.sort(
+			(a, b) =>
+				getSearchScore(b.title, normalizedQuery) -
+				getSearchScore(a.title, normalizedQuery)
+		);
+	}, [items, debouncedQuery]);
 
 	const handleDelete = async () => {
 		if (!target) return;

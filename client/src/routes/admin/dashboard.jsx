@@ -1,10 +1,18 @@
-import { Link } from "../../components/link";
 import { useCallback, useEffect, useState } from "react";
 import { ShieldAlert, Trash2, Loader2 } from "lucide-react";
-import { formatPrice } from "../../lib/demo-data";
+
 import { Button } from "../../components/ui";
-import { useAuth } from "../../context/AuthContext";
+import { Link } from "../../components/link";
+
+import { useAuth } from "../../hooks/useAuth";
+
+import { formatPrice } from "@/lib/formatters";
 import { profileApi, announceApi } from "../../services/api";
+import {
+	buildCacheKey,
+	readCacheEntry,
+	writeCacheEntry,
+} from "../../services/cache";
 import { showToast } from "../../services/toast";
 
 export default function Page() {
@@ -17,17 +25,34 @@ export default function Page() {
 	const [actionLoading, setActionLoading] = useState(false);
 
 	const loadData = useCallback(async () => {
+		const cacheKey = buildCacheKey("admin:dashboard", {
+			userId: user?.id || "anonymous",
+		});
+		const cachedDashboard = readCacheEntry(cacheKey);
+		if (cachedDashboard) {
+			setUsers((cachedDashboard.users || []).filter((u) => u.id !== user?.id));
+			setListings(cachedDashboard.listings || []);
+			setLoadingData(false);
+		}
+
 		setLoadingData(true);
 		try {
 			const [fetchedUsers, fetchedListings] = await Promise.all([
 				profileApi.getAll().catch(() => []),
 				announceApi.getAll().catch(() => []),
 			]);
-			const loggedUserId = user?.id;
-			setUsers((fetchedUsers || []).filter((u) => u.id !== loggedUserId));
-			setListings(fetchedListings || []);
+			const nextUsers = (fetchedUsers || []).filter((u) => u.id !== user?.id);
+			const nextListings = fetchedListings || [];
+			const nextValue = { users: nextUsers, listings: nextListings };
+			writeCacheEntry(cacheKey, nextValue);
+			setUsers(nextUsers);
+			setListings(nextListings);
 		} catch (err) {
 			console.warn("Erro ao carregar dados do dashboard:", err);
+			if (!cachedDashboard) {
+				setUsers([]);
+				setListings([]);
+			}
 		} finally {
 			setLoadingData(false);
 		}
@@ -188,10 +213,7 @@ export default function Page() {
 										</p>
 									</div>
 									<div className="flex items-center gap-2">
-										<Link
-											to="/usuario/$id"
-											params={{ id: u.id }}
-										>
+										<Link to="/usuario/$id" params={{ id: u.id }}>
 											<Button size="sm" variant="secondary">
 												Ver Perfil
 											</Button>
