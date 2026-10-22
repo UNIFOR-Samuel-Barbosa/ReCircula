@@ -1,8 +1,13 @@
-import { useNavigate } from "../../hooks/useNavigation";
 import { useEffect, useState } from "react";
 import { Gift, ImagePlus, Loader2 } from "lucide-react";
+
 import { Button, Field, Input, Select, Textarea } from "../../components/ui";
+
 import { useAuth } from "../../context/AuthContext";
+
+import { useNavigate } from "../../hooks/useNavigation";
+import { categories } from "../../hooks/useCategories";
+
 import { announceApi } from "../../services/api";
 import { showToast } from "../../services/toast";
 
@@ -176,16 +181,7 @@ export default function Page() {
 							<option value="" disabled>
 								Selecione uma categoria
 							</option>
-							{[
-								"Livros",
-								"Eletrônicos",
-								"Acessórios",
-								"Jalecos",
-								"Engenharia",
-								"Computação",
-								"Móveis",
-								"Outros",
-							].map((x) => (
+							{categories.map((x) => (
 								<option key={x} value={x}>
 									{x}
 								</option>

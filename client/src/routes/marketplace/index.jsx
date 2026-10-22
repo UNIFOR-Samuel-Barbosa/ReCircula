@@ -4,8 +4,9 @@ import { Search, SlidersHorizontal, Sparkles, Gift, Loader2 } from "lucide-react
 import { ListingCard } from "../../components/listing-card";
 import { Button, Input, Select } from "../../components/ui";
 
-import { categories as defaultCategories } from "../../lib/demo-data";
+import { categories } from "../../hooks/useCategories";
 import useDebounce from "../../hooks/useDebounce";
+
 import { announceApi } from "../../services/api";
 import { buildCacheKey, readCacheEntry, writeCacheEntry } from "../../services/cache";
 import { showLoadingToast, showToast, toast } from "../../services/toast";
@@ -199,7 +200,7 @@ export default function Index() {
 			<section className="mx-auto max-w-7xl px-4 py-8 lg:px-8">
 				<div className="mb-7 flex flex-col gap-5">
 					<div className="flex gap-2 overflow-x-auto pb-1">
-						{defaultCategories.map((item) => (
+						{categories.map((item) => (
 							<Button
 								key={item}
 								size="sm"
@@ -231,7 +232,7 @@ export default function Index() {
 							<Select
 								value={order}
 								onChange={(e) => setOrder(e.target.value)}
-								className="w-40"
+								className="w-40 cursor-pointer"
 							>
 								<option value="recent">Mais recentes</option>
 								<option value="price-asc">Menor preço</option>
