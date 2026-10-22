@@ -13,6 +13,7 @@ import { Link } from "../../components/link";
 import { ProfileAvatar } from "../../components/profile-avatar";
 import { useAuth } from "../../context/AuthContext";
 import { announceApi, profileApi } from "../../services/api";
+import { buildCacheKey, readCacheEntry, writeCacheEntry } from "../../services/cache";
 import { showToast } from "../../services/toast";
 import {
 	formatTelephone,
@@ -101,20 +102,31 @@ export default function Page() {
 	}, [resetFormFromProfile, user]);
 
 	useEffect(() => {
-		if (isLoggedIn) {
-			announceApi
-				.getMine()
-				.then((items) => {
-					setUserAnnounces(items || []);
-				})
-				.catch((err) => {
-					console.warn("Não foi possível carregar anúncios do usuário:", err);
-				})
-				.finally(() => {
-					setLoadingAnnounces(false);
-				});
+		if (!isLoggedIn) return;
+
+		const cacheKey = buildCacheKey("profile:announces", { userId: user?.id || "me" });
+		const cachedItems = readCacheEntry(cacheKey);
+		if (cachedItems) {
+			setUserAnnounces(cachedItems);
 		}
-	}, [isLoggedIn]);
+
+		announceApi
+			.getMine()
+			.then((items) => {
+				const nextItems = items || [];
+				writeCacheEntry(cacheKey, nextItems);
+				setUserAnnounces(nextItems);
+			})
+			.catch((err) => {
+				console.warn("Não foi possível carregar anúncios do usuário:", err);
+				if (!cachedItems) {
+					setUserAnnounces([]);
+				}
+			})
+			.finally(() => {
+				setLoadingAnnounces(false);
+			});
+	}, [isLoggedIn, user?.id]);
 
 	if (isLoading || !user) {
 		return (

@@ -1,8 +1,12 @@
 import { Suspense, useEffect, useState } from "react";
+import { Loader2 } from "lucide-react";
+
 import { AppShell } from "./components/app-shell";
 import { Link } from "./components/link";
+
 import { NavigationProvider } from "./context/NavigationContext";
 import { AuthProvider } from "./context/AuthContext";
+
 import { matchRoute } from "./lib/routes";
 import { ToastProvider } from "./services/toast";
 
@@ -25,7 +29,13 @@ export function AppRouter() {
 	}, [route?.title]);
 
 	const page = route ? (
-		<Suspense fallback={<div className="p-10 text-center">Carregando...</div>}>
+		<Suspense
+			fallback={
+				<div className="w-full min-h-screen flex justify-center items-center">
+					<Loader2 className="size-5 animate-spin text-white" />
+				</div>
+			}
+		>
 			<route.Component key={pathname} />
 		</Suspense>
 	) : (

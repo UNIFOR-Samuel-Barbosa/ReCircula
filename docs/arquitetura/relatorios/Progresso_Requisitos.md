@@ -30,8 +30,8 @@ Considerando o estado atual do sistema/projeto e os requisitos da documentação
 - [ x ] RNF02 — Autorização e controle de acesso
 - [ x ] RNF03 — Validação de dados
 - [ x ] RNF04 — Tratamento centralizado de erros
-- [ ] RNF05 — Performance — Cache Stale While Revalidate
-- [ ] RNF06 — Performance — Debounce de busca
+- [ x ] RNF05 — Performance — Cache Stale While Revalidate
+- [ x ] RNF06 — Performance — Debounce de busca
 - [ x ] RNF07 — Responsividade
 - [ x ] RNF08 — Usabilidade — Feedback visual
 - [ x ] RNF09 — Arquitetura em camadas (Backend)

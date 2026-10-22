@@ -1,4 +1,5 @@
 import { createElement } from "react";
+import { Loader2 } from "lucide-react";
 import { Toaster, toast } from "sonner";
 
 const toastPalette = {
@@ -66,3 +67,34 @@ export function showToast({
 		},
 	});
 }
+
+export function showLoadingToast() {
+	return toast.custom(
+		() =>
+			createElement(
+				"div",
+				{
+					role: "status",
+					"aria-label": "Atualizando anúncios",
+					className: "grid size-10 place-items-center rounded-xl",
+				},
+				createElement(Loader2, {
+					className: "size-5 animate-spin text-white",
+					"aria-hidden": true,
+				})
+			),
+		{
+			duration: Infinity,
+			closeButton: false,
+			className: "rounded-xl border",
+			style: {
+				backgroundColor: "#000000",
+				border: "1px solid #111827",
+				color: "white",
+				boxShadow: "0 16px 38px rgba(15, 23, 42, 0.18)",
+			},
+		}
+	);
+}
+
+export { toast };
