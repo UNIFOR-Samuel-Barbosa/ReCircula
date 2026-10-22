@@ -208,13 +208,13 @@
 
 ## 📐 Regras de Negócio
 
-| ID   | Regra                                                                                                            |
-| ---- | ---------------------------------------------------------------------------------------------------------------- |
-| RN01 | Um anúncio marcado como **doação** não pode ter preço preenchido.                                                |
-| RN02 | O preço de um anúncio, quando informado, deve ser **maior ou igual a zero**.                                     |
-| RN03 | Somente o **dono do anúncio** pode editá-lo ou excluí-lo.                                                        |
-| RN04 | Somente o **dono do perfil** pode editá-lo.                                                                      |
-| RN05 | O botão de contato via WhatsApp só é exibido ao visualizar o **perfil de outro usuário** (não o próprio).        |
-| RN06 | Operações de escrita (criar, editar, excluir) **requerem conexão com a internet**.                               |
-| RN07 | O campo telefone é formatado automaticamente conforme o usuário digita.                                          |
-| RN08 | A biografia do perfil está limitada a **150 caracteres** tanto no backend quanto no campo de edição do frontend. |
+| ID   | Regra                                                                                                                           |
+| ---- | ------------------------------------------------------------------------------------------------------------------------------- |
+| RN01 | Um anúncio marcado como **doação** não pode ter preço preenchido.                                                               |
+| RN02 | O preço de um anúncio, quando informado, deve ser **maior ou igual a zero**.                                                    |
+| RN03 | Somente o **dono do anúncio** pode editá-lo ou excluí-lo.                                                                       |
+| RN04 | Somente o **dono do perfil** pode editá-lo.                                                                                     |
+| RN05 | O botão de contato via WhatsApp só é exibido ao visualizar o **perfil de outro usuário** (não o próprio).                       |
+| RN06 | Operações de escrita (criar, editar, excluir) **requerem conexão com a internet**. (deve haver um tratamento de error amigável) |
+| RN07 | O campo telefone é formatado automaticamente conforme o usuário digita.                                                         |
+| RN08 | A biografia do perfil está limitada a **150 caracteres** tanto no backend quanto no campo de edição do frontend.                |
