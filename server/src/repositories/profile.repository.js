@@ -40,6 +40,18 @@ export async function findByEmailWithPassword(email) {
 	return data;
 }
 
+export async function findByIdWithPassword(id) {
+	const { data, error } = await supabase
+		.from("profiles")
+		.select(`${PROFILE_COLUMNS}, password_hash`)
+		.eq("id", id)
+		.maybeSingle();
+
+	if (error) throw error;
+
+	return data;
+}
+
 export async function create(data) {
 	const { data: profile, error } = await supabase
 		.from("profiles")

@@ -49,3 +49,12 @@ export const resetPasswordSchema = z.object({
 	token: token("Token de recuperação é obrigatório."),
 	password,
 });
+
+export const deleteAccountSchema = z.object({
+	password: z
+		.string({ error: "Senha é obrigatória." })
+		.min(1, "Senha é obrigatória."),
+	confirmation: z.literal("EXCLUIR", {
+		error: "Digite EXCLUIR para confirmar a exclusão da conta.",
+	}),
+});
