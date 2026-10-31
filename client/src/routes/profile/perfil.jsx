@@ -5,12 +5,28 @@ import {
 	useRef,
 	useCallback,
 } from "react";
-import { Camera, Edit3, LogOut, Loader2, Plus, Sparkles } from "lucide-react";
+import {
+	Camera,
+	Edit3,
+	LogOut,
+	Loader2,
+	Plus,
+	Sparkles,
+	Trash2,
+} from "lucide-react";
 
 import { ListingCard } from "../../components/listing-card";
 import { Button, Field, Input, Textarea } from "../../components/ui";
 import { Link } from "../../components/link";
 import { ProfileAvatar } from "../../components/profile-avatar";
+import {
+	AlertDialog,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+} from "../../components/ui/alert-dialog";
 
 import { useNavigate } from "../../hooks/useNavigation";
 import { useAuth } from "../../hooks/useAuth";
@@ -30,11 +46,16 @@ import { showToast } from "../../services/toast";
 
 export default function Page() {
 	const nav = useNavigate();
-	const { user, isLoggedIn, isLoading, signOut, updateUser } = useAuth();
+	const { user, isLoggedIn, isLoading, signOut, updateUser, deleteAccount } =
+		useAuth();
 	const [editing, setEditing] = useState(false);
 	const [saving, setSaving] = useState(false);
 	const [userAnnounces, setUserAnnounces] = useState([]);
 	const [loadingAnnounces, setLoadingAnnounces] = useState(true);
+	const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+	const [deletePassword, setDeletePassword] = useState("");
+	const [deleteConfirmation, setDeleteConfirmation] = useState("");
+	const [deletingAccount, setDeletingAccount] = useState(false);
 
 	const [name, setName] = useState("");
 	const [biography, setBiography] = useState("");
@@ -325,6 +346,34 @@ export default function Page() {
 		setEditing(false);
 	};
 
+	const closeDeleteDialog = () => {
+		if (deletingAccount) return;
+		setDeleteDialogOpen(false);
+		setDeletePassword("");
+		setDeleteConfirmation("");
+	};
+
+	const handleDeleteAccount = async (event) => {
+		event.preventDefault();
+		setDeletingAccount(true);
+
+		try {
+			await deleteAccount({
+				password: deletePassword,
+				confirmation: deleteConfirmation,
+			});
+			showToast({ text: "Sua conta foi excluída com sucesso.", color: "green" });
+			nav({ to: "/" });
+		} catch (err) {
+			showToast({
+				text: err.message || "Não foi possível excluir sua conta.",
+				color: "red",
+			});
+		} finally {
+			setDeletingAccount(false);
+		}
+	};
+
 	return (
 		<div className="mx-auto max-w-6xl px-4 py-10 lg:px-8">
 			<div className="flex flex-col gap-6 border-b border-border pb-8 sm:flex-row sm:items-center">
@@ -422,6 +471,27 @@ export default function Page() {
 					</div>
 				)}
 			</div>
+
+			<section className="mt-12 rounded-lg border border-destructive/40 bg-destructive/5 p-5 sm:p-6">
+				<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+					<div>
+						<h2 className="font-display text-xl font-semibold text-destructive">
+							Zona de perigo
+						</h2>
+						<p className="mt-1 max-w-2xl text-sm text-muted-foreground">
+							A exclusão é permanente e também remove todos os seus anúncios,
+							sessões e dados de recuperação.
+						</p>
+					</div>
+					<Button
+						variant="danger"
+						onClick={() => setDeleteDialogOpen(true)}
+					>
+						<Trash2 className="size-4" />
+						Excluir minha conta
+					</Button>
+				</div>
+			</section>
 
 			{editing && (
 				<div className="fixed inset-0 z-60 grid place-items-center overflow-y-auto bg-overlay px-4 py-8">
@@ -583,6 +653,71 @@ export default function Page() {
 					</form>
 				</div>
 			)}
+
+			<AlertDialog open={deleteDialogOpen} onOpenChange={closeDeleteDialog}>
+				<AlertDialogContent>
+					<form onSubmit={handleDeleteAccount}>
+						<AlertDialogHeader>
+							<AlertDialogTitle>Excluir sua conta?</AlertDialogTitle>
+							<AlertDialogDescription>
+								Esta ação não pode ser desfeita. Seus anúncios, sessões e
+								dados de recuperação serão removidos permanentemente.
+							</AlertDialogDescription>
+						</AlertDialogHeader>
+						<div className="mt-5 grid gap-4">
+							<Field label="Digite sua senha para continuar">
+								<Input
+									type="password"
+									autoComplete="current-password"
+									value={deletePassword}
+									onChange={(event) => setDeletePassword(event.target.value)}
+									disabled={deletingAccount}
+									autoFocus
+									required
+								/>
+							</Field>
+							<Field label='Digite EXCLUIR para confirmar'>
+								<Input
+									value={deleteConfirmation}
+									onChange={(event) => setDeleteConfirmation(event.target.value)}
+									disabled={deletingAccount}
+									autoCapitalize="characters"
+									autoComplete="off"
+									required
+								/>
+							</Field>
+						</div>
+						<AlertDialogFooter className="mt-6">
+							<Button
+								type="button"
+								variant="secondary"
+								onClick={closeDeleteDialog}
+								disabled={deletingAccount}
+							>
+								Cancelar
+							</Button>
+							<Button
+								type="submit"
+								variant="danger"
+								disabled={
+									deletingAccount ||
+									deleteConfirmation !== "EXCLUIR" ||
+									!deletePassword
+								}
+							>
+								{deletingAccount ? (
+									<>
+										<Loader2 className="size-4 animate-spin" />
+										Excluindo...
+									</>
+								) : (
+									"Excluir conta permanentemente"
+								)}
+							</Button>
+						</AlertDialogFooter>
+					</form>
+				</AlertDialogContent>
+			</AlertDialog>
 		</div>
 	);
 }
