@@ -30,6 +30,12 @@ export async function logout(req, res) {
 	res.status(204).send();
 }
 
+export async function deleteAccount(req, res) {
+	await authService.deleteAccount(req.user.id, req.body.password);
+
+	res.status(204).send();
+}
+
 export async function forgotPassword(req, res) {
 	await authService.forgotPassword(req.body.email);
 

@@ -209,6 +209,23 @@ export const authApi = {
 		clearSession();
 	},
 
+	async deleteAccount({ password, confirmation }) {
+		try {
+			await apiRequest("/auth/account", {
+				method: "DELETE",
+				body: { password, confirmation },
+			});
+		} catch (error) {
+			if (error.status === 404) {
+				throw new Error(
+					"A exclusão de conta ainda não está disponível no servidor. Tente novamente após a atualização."
+				);
+			}
+			throw error;
+		}
+		clearSession();
+	},
+
 	async forgotPassword(email) {
 		return apiRequest("/auth/forgot-password", {
 			method: "POST",

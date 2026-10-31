@@ -12,6 +12,7 @@ export const AUTH_CONTEXT_DEFAULT_VALUE = {
 	forgotPassword: async () => {},
 	resetPassword: async () => {},
 	signOut: async () => {},
+	deleteAccount: async () => {},
 	updateUser: async () => {},
 	reloadUser: async () => {},
 };

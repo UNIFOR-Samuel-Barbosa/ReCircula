@@ -1,10 +1,12 @@
 import { Router } from "express";
 
 import { validate } from "../middlewares/validate.middleware.js";
+import { authenticate } from "../middlewares/authenticate.middleware.js";
 
 import * as authController from "../controllers/auth.controller.js";
 
 import {
+	deleteAccountSchema,
 	forgotPasswordSchema,
 	loginSchema,
 	refreshTokenSchema,
@@ -28,6 +30,13 @@ router.post("/login", validate(loginSchema), authController.login);
 router.post("/refresh", validate(refreshTokenSchema), authController.refresh);
 
 router.post("/logout", validate(refreshTokenSchema), authController.logout);
+
+router.delete(
+	"/account",
+	authenticate,
+	validate(deleteAccountSchema),
+	authController.deleteAccount
+);
 
 router.post(
 	"/forgot-password",

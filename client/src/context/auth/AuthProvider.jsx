@@ -97,6 +97,13 @@ export function AuthProvider({ children }) {
 		setToken(null);
 	}, []);
 
+	const deleteAccount = useCallback(async (credentials) => {
+		ensureOnlineForAuthAction("Exclusão da conta");
+		await authApi.deleteAccount(credentials);
+		setUser(null);
+		setToken(null);
+	}, []);
+
 	const updateUser = useCallback(async (data) => {
 		ensureOnlineForAuthAction("Atualização do perfil");
 		const updated = await profileApi.update(data);
@@ -129,6 +136,7 @@ export function AuthProvider({ children }) {
 		forgotPassword,
 		resetPassword,
 		signOut,
+		deleteAccount,
 		updateUser,
 		reloadUser,
 	};

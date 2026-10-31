@@ -160,6 +160,26 @@ export async function logout(refreshToken) {
 	}
 }
 
+export async function deleteAccount(userId, password) {
+	const user = await profileRepository.findByIdWithPassword(userId);
+
+	if (!user) {
+		throw invalidSession();
+	}
+
+	const passwordMatches = await bcrypt.compare(password, user.password_hash);
+
+	if (!passwordMatches) {
+		// 403 evita que o cliente interprete uma senha incorreta como token expirado
+		// e tente renovar a sessão antes de exibir o erro.
+		throw new AppError("Senha inválida.", 403);
+	}
+
+	// As chaves estrangeiras removem os anúncios, sessões e tokens de
+	// recuperação associados ao perfil na mesma operação do banco.
+	await profileRepository.remove(userId);
+}
+
 export async function forgotPassword(email) {
 	const user = await profileRepository.findByEmail(email);
 
