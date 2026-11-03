@@ -6,6 +6,12 @@ const ACCESS_TOKEN_KEY = "recircula_access_token";
 const REFRESH_TOKEN_KEY = "recircula_refresh_token";
 const USER_KEY = "recircula_user";
 
+// Timeout padrão para requisições normais (10 s).
+// Requisições de upload (FormData) usam UPLOAD_TIMEOUT_MS, bem maior,
+// pois o servidor precisa de tempo para encaminhar o arquivo ao Cloudinary.
+const DEFAULT_TIMEOUT_MS = 10_000;
+const UPLOAD_TIMEOUT_MS = 150_000; // 150 s — sincronizado com server.setTimeout()
+
 export function getAccessToken() {
 	return localStorage.getItem(ACCESS_TOKEN_KEY);
 }
@@ -92,22 +98,36 @@ export async function apiRequest(endpoint, options = {}) {
 
 	const url = endpoint.startsWith("http") ? endpoint : `${API_URL}${endpoint}`;
 
+	// Uploads de arquivo precisam de um timeout bem maior para suportar
+	// redes lentas + latência do Cloudinary no Render free tier.
+	const timeoutMs = isFormData ? UPLOAD_TIMEOUT_MS : DEFAULT_TIMEOUT_MS;
+	const controller = new AbortController();
+	const timer = setTimeout(() => controller.abort(), timeoutMs);
+
 	const config = {
 		method,
 		headers: requestHeaders,
 		body: isFormData ? body : (body && typeof body === "object" ? JSON.stringify(body) : body),
+		signal: controller.signal,
 	};
 
 	let response;
 	try {
 		response = await fetch(url, config);
-	} catch {
+	} catch (err) {
+		if (err?.name === "AbortError") {
+			throw new Error(
+				"A requisição demorou muito e foi cancelada. Verifique sua conexão e tente novamente."
+			);
+		}
 		if (typeof navigator !== "undefined" && !navigator.onLine) {
 			assertWriteOnline("Esta ação");
 		}
 		throw new Error(
 			"Não foi possível conectar ao servidor. Verifique se a API está em execução."
 		);
+	} finally {
+		clearTimeout(timer);
 	}
 
 	// Token expirado: tenta renovar via refresh token (apenas 1 tentativa)
