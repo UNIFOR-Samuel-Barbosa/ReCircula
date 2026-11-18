@@ -2,7 +2,7 @@ import { Button } from "./ui";
 import { Link } from "./link";
 import { ProfileMenu } from "./profile-menu";
 import { useAuth } from "../hooks/useAuth";
-import { Home, LayoutGrid, Plus, UserRound, LogIn, HelpCircle } from "lucide-react";
+import { Home, LayoutGrid, Plus, UserRound, LogIn, HelpCircle, Lightbulb } from "lucide-react";
 
 import recirculaLogo from "../assets/recircula-logo.png";
 
@@ -76,15 +76,29 @@ export function AppShell({ children }) {
 						</Link>
 						{isLoggedIn && <ProfileMenu />}
 					</div>
+
+					{/* Ícone minimalista verde para celular — leva ao tutorial */}
+					<div className="flex items-center md:hidden">
+						<Link
+							to="/tutorial"
+							activeOptions={{ exact: true }}
+							aria-label="Como usar o ReCircula — Tutorial"
+							className="group flex size-9 items-center justify-center rounded-full text-primary transition-all duration-200 hover:bg-primary/20 active:scale-95 [&.active]:bg-primary/25 [&.active]:shadow-sm [&.active]:shadow-primary/25"
+							title="Como funciona a plataforma"
+						>
+							<Lightbulb className="size-4.5 stroke-[2.2] text-primary transition-transform duration-200 group-hover:rotate-12" />
+							<span className="sr-only">Como funciona</span>
+						</Link>
+					</div>
 				</div>
 			</header>
 
-			<main className="pb-24 md:pb-10">{children}</main>
+			<main className="pb-12 md:pb-10">{children}</main>
 
-			<footer className="hidden border-t border-border bg-card/50 py-6 md:block">
-				<div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 lg:px-8">
-					<div className="flex items-center gap-2 text-sm text-muted-foreground">
-						<HelpCircle className="size-4 text-primary" />
+			<footer className="mb-20 border-t border-border bg-card/40 py-6 text-sm md:mb-0">
+				<div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-4 text-center sm:flex-row sm:text-left lg:px-8">
+					<div className="flex items-center gap-2 text-muted-foreground">
+						<HelpCircle className="size-4 shrink-0 text-primary" />
 						<span>Precisa de ajuda?</span>
 						<Link
 							to="/tutorial"
@@ -93,7 +107,7 @@ export function AppShell({ children }) {
 							Veja o tutorial
 						</Link>
 					</div>
-					<div className="text-center text-xs text-muted-foreground/60">
+					<div className="text-xs text-muted-foreground/60">
 						ReCircula &mdash; Economia circular no campus &copy;{" "}
 						{new Date().getFullYear()}
 					</div>
