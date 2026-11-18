@@ -61,6 +61,11 @@ export const routes = [
 		title: "Detalhes do anúncio — ReCircula",
 		Component: lazy(() => import("../routes/marketplace/anuncio.$id.jsx")),
 	},
+	{
+		path: "/tutorial",
+		title: "Como usar — ReCircula",
+		Component: lazy(() => import("../routes/tutorial.jsx")),
+	},
 ];
 
 export function matchRoute(pathname) {

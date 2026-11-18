@@ -2,7 +2,7 @@ import { Button } from "./ui";
 import { Link } from "./link";
 import { ProfileMenu } from "./profile-menu";
 import { useAuth } from "../hooks/useAuth";
-import { Home, LayoutGrid, Plus, UserRound, LogIn } from "lucide-react";
+import { Home, LayoutGrid, Plus, UserRound, LogIn, HelpCircle, Lightbulb } from "lucide-react";
 
 import recirculaLogo from "../assets/recircula-logo.png";
 
@@ -52,6 +52,12 @@ export function AppShell({ children }) {
 								{label}
 							</Link>
 						))}
+						<Link
+							to="/tutorial"
+							className="rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground [&.active]:bg-accent [&.active]:text-foreground text-center"
+						>
+							Tutorial
+						</Link>
 					</nav>
 					<div className="hidden items-center gap-2 md:flex">
 						{!isLoggedIn && (
@@ -70,10 +76,62 @@ export function AppShell({ children }) {
 						</Link>
 						{isLoggedIn && <ProfileMenu />}
 					</div>
+
+					{/* Ícone minimalista verde para celular — leva ao tutorial */}
+					<div className="flex items-center md:hidden">
+						<Link
+							to="/tutorial"
+							activeOptions={{ exact: true }}
+							aria-label="Como usar o ReCircula — Tutorial"
+							className="group flex size-9 items-center justify-center rounded-full text-primary transition-all duration-200 hover:bg-primary/20 active:scale-95 [&.active]:bg-primary/25 [&.active]:shadow-sm [&.active]:shadow-primary/25"
+							title="Como funciona a plataforma"
+						>
+							<Lightbulb className="size-4.5 stroke-[2.2] text-primary transition-transform duration-200 group-hover:rotate-12" />
+							<span className="sr-only">Como funciona</span>
+						</Link>
+					</div>
 				</div>
 			</header>
 
-			<main className="pb-24 md:pb-10">{children}</main>
+			<main className="pb-12 md:pb-10">{children}</main>
+
+			<footer className="mb-20 border-t border-border bg-card/40 py-6 text-sm md:mb-0">
+				<div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-4 text-center sm:flex-row sm:text-left lg:px-8">
+					<div className="flex items-center gap-2 text-muted-foreground">
+						<HelpCircle className="size-4 shrink-0 text-primary" />
+						<span>Precisa de ajuda?</span>
+						<Link
+							to="/tutorial"
+							className="font-medium text-primary hover:underline"
+						>
+							Veja o tutorial
+						</Link>
+					</div>
+					<div className="text-xs text-muted-foreground/60">
+						ReCircula &mdash; Economia circular no campus &copy;{" "}
+						{new Date().getFullYear()}
+					</div>
+					<div className="flex items-center gap-4 text-xs text-muted-foreground">
+						<Link to="/" className="transition-colors hover:text-foreground">
+							Explorar
+						</Link>
+						<span className="text-border">•</span>
+						<Link
+							to="/tutorial"
+							className="transition-colors hover:text-foreground"
+						>
+							Tutorial
+						</Link>
+						<span className="text-border">•</span>
+						<Link
+							to="/entrar"
+							className="transition-colors hover:text-foreground"
+						>
+							Entrar
+						</Link>
+					</div>
+				</div>
+			</footer>
 
 			<nav
 				className="fixed inset-x-0 bottom-0 z-50 grid h-18 grid-cols-4 border-t border-border bg-background/95 px-2 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl md:hidden"
