@@ -2,7 +2,7 @@ import { Button } from "./ui";
 import { Link } from "./link";
 import { ProfileMenu } from "./profile-menu";
 import { useAuth } from "../hooks/useAuth";
-import { Home, LayoutGrid, Plus, UserRound, LogIn } from "lucide-react";
+import { Home, LayoutGrid, Plus, UserRound, LogIn, HelpCircle } from "lucide-react";
 
 import recirculaLogo from "../assets/recircula-logo.png";
 
@@ -52,6 +52,12 @@ export function AppShell({ children }) {
 								{label}
 							</Link>
 						))}
+						<Link
+							to="/tutorial"
+							className="rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground [&.active]:bg-accent [&.active]:text-foreground text-center"
+						>
+							Tutorial
+						</Link>
 					</nav>
 					<div className="hidden items-center gap-2 md:flex">
 						{!isLoggedIn && (
@@ -74,6 +80,44 @@ export function AppShell({ children }) {
 			</header>
 
 			<main className="pb-24 md:pb-10">{children}</main>
+
+			<footer className="hidden border-t border-border bg-card/50 py-6 md:block">
+				<div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 lg:px-8">
+					<div className="flex items-center gap-2 text-sm text-muted-foreground">
+						<HelpCircle className="size-4 text-primary" />
+						<span>Precisa de ajuda?</span>
+						<Link
+							to="/tutorial"
+							className="font-medium text-primary hover:underline"
+						>
+							Veja o tutorial
+						</Link>
+					</div>
+					<div className="text-center text-xs text-muted-foreground/60">
+						ReCircula &mdash; Economia circular no campus &copy;{" "}
+						{new Date().getFullYear()}
+					</div>
+					<div className="flex items-center gap-4 text-xs text-muted-foreground">
+						<Link to="/" className="transition-colors hover:text-foreground">
+							Explorar
+						</Link>
+						<span className="text-border">•</span>
+						<Link
+							to="/tutorial"
+							className="transition-colors hover:text-foreground"
+						>
+							Tutorial
+						</Link>
+						<span className="text-border">•</span>
+						<Link
+							to="/entrar"
+							className="transition-colors hover:text-foreground"
+						>
+							Entrar
+						</Link>
+					</div>
+				</div>
+			</footer>
 
 			<nav
 				className="fixed inset-x-0 bottom-0 z-50 grid h-18 grid-cols-4 border-t border-border bg-background/95 px-2 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl md:hidden"
